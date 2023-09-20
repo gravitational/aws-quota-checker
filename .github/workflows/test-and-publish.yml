@@ -1,12 +1,4 @@
-on:
-  pull_request:
-    branches:
-      - master
-  push:
-    branches:
-      - master
-    tags:
-      - "*"
+on: workflow_dispatch
 
 jobs:
   test:
