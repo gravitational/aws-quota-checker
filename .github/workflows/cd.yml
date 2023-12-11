@@ -30,15 +30,10 @@ jobs:
     name: Build and push Docker image
     env:
       AWS_REGION: us-west-2
-      AWS_ROLE: TBD
+      AWS_ROLE: arn:aws:iam::146628656107:role/cloud-github-action-ecr-role
     steps:
       - name: checkout
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2
-        with:
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.CR_PAT }}
       - name: setup docker buildx
         uses: docker/setup-buildx-action@v2
       - name: build docker image
@@ -49,8 +44,12 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ env.AWS_ROLE }}
       - name: login to ECR
+        id: login-ecr
         uses: aws-actions/amazon-ecr-login@2fc7aceee09e9e4a7105c0d060c656fad0b4f63d # v1
+      - name: export ECR Repository
+        run: |
+          echo "ECR_REPOSITORY=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
       - name: push docker image
         run: |
-          docker tag gravitational/aws-quota-checker:staged gravitational/aws-quota-checker:${GITHUB_REF##*/}
-          docker push gravitational/aws-quota-checker:${GITHUB_REF##*/}
+          docker tag gravitational/aws-quota-checker:staged ${ECR_REPOSITORY}/gravitational/aws-quota-checker:${GITHUB_REF##*/}
+          docker push ${ECR_REPOSITORY}/gravitational/aws-quota-checker:${GITHUB_REF##*/}
