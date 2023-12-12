@@ -31,7 +31,7 @@ jobs:
     name: Build and push Docker image
     env:
       AWS_REGION: us-west-2
-      AWS_ROLE: arn:aws:iam::146628656107:role/cloud-github-action-ecr-role
+      AWS_ROLE: arn:aws:iam::146628656107:role/aws-quota-checker-github-action-ecr-role
     steps:
       - name: checkout
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
