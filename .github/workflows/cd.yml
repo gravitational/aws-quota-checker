@@ -30,7 +30,7 @@ jobs:
     needs: [test]
     name: Build and push Docker image
     env:
-      AWS_REGION: us-west-2
+      AWS_REGION: us-east-1
       AWS_ROLE: arn:aws:iam::146628656107:role/aws-quota-checker-github-action-ecr-role
     steps:
       - name: checkout
