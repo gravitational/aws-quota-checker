@@ -1,8 +1,8 @@
 name: cd
 on:
   push:
-    tags:
-    - 'v[0-9]+.[0-9]+.[0-9]+*'
+    branches:
+    - teleport
 
 permissions:
   contents: read
@@ -49,10 +49,19 @@ jobs:
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v1
         with:
           registry-type: public
+      - name: Get Time
+        id: time
+        uses: nanzm/get-time-action@887e4db9af58ebae64998b7105921b816af77977 # v2.0
+        with:
+          format: "%Y%m%dT%H%M%S"
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@102b1a064a9b145e56556e22b18b19c624538d94 # v4.4.1
+      - name: export ECR Tag
+        run: echo "ECR_TAG=${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}-${{ steps.time.outputs.time }}" >> $GITHUB_ENV
       - name: export ECR Repository
         run: |
           echo "ECR_REPOSITORY=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
       - name: push docker image
         run: |
-          docker tag gravitational/aws-quota-checker:staged ${ECR_REPOSITORY}/gravitational/aws-quota-checker:${GITHUB_REF##*/}
-          docker push ${ECR_REPOSITORY}/gravitational/aws-quota-checker:${GITHUB_REF##*/}
+          docker tag gravitational/aws-quota-checker:staged ${ECR_REPOSITORY}/gravitational/aws-quota-checker:${ECR_TAG}
+          docker push ${ECR_REPOSITORY}/gravitational/aws-quota-checker:${ECR_TAG}
