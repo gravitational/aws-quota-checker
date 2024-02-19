@@ -1,8 +1,8 @@
 name: cd
 on:
   push:
-    branches:
-    - teleport
+    # branches:
+    # - teleport
   workflow_dispatch:
 
 permissions:
@@ -65,7 +65,7 @@ jobs:
       - name: Build the Docker image and push
         uses: docker/build-push-action@v5
         with:
-          push: true
+          push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
