@@ -55,7 +55,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ github.repository }}
+            ghcr.io/${{ github.repository }}
           flavor: |
             latest=false
           tags: |
