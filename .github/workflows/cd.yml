@@ -59,7 +59,7 @@ jobs:
           flavor: |
             latest=false
           tags: |
-            type=sha,prefix{{branch}}-,suffix=-{{date 'YYYYMMDDTHHmmss'}},format=short,enable=true
+            type=sha,prefix={{branch}}-,suffix=-{{date 'YYYYMMDDTHHmmss'}},format=short,enable=true
   
       - name: Build the Docker image and push
         uses: docker/build-push-action@v5
