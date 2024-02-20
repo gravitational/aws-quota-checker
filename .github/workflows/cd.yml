@@ -37,9 +37,8 @@ jobs:
       - name: checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: setup docker buildx
-        uses: docker/setup-buildx-action@v2
-      - name: build docker image
-        run: docker build . --tag gravitational/aws-quota-checker:staged
+        uses: docker/setup-buildx-action@v3
+        
       - name: configure AWS credentials
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
         with:
@@ -50,19 +49,23 @@ jobs:
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
         with:
           registry-type: public
-      - name: Get Time
-        id: time
-        uses: nanzm/get-time-action@887e4db9af58ebae64998b7105921b816af77977 # v2.0
+
+      - name: Prepare docker labels and tags
+        id: meta
+        uses: docker/metadata-action@v5
         with:
-          format: "%Y%m%dT%H%M%S"
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@102b1a064a9b145e56556e22b18b19c624538d94 # v4.4.1
-      - name: export ECR Tag
-        run: echo "ECR_TAG=${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}-${{ steps.time.outputs.time }}" >> $GITHUB_ENV
-      - name: export ECR Repository
-        run: |
-          echo "ECR_REPOSITORY=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
-      - name: push docker image
-        run: |
-          docker tag gravitational/aws-quota-checker:staged ${ECR_REPOSITORY}/gravitational/aws-quota-checker:${ECR_TAG}
-          docker push ${ECR_REPOSITORY}/gravitational/aws-quota-checker:${ECR_TAG}
+          images: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ github.repository }}
+          flavor: |
+            latest=false
+          tags: |
+            type=sha,prefix={{branch}}-,suffix=-{{date 'YYYYMMDDTHHmmss'}},format=short,enable=true
+  
+      - name: Build the Docker image and push
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
