@@ -5,15 +5,25 @@ import cachetools
 
 
 @cachetools.cached(cache=cachetools.TTLCache(1, 60))
-def get_all_running_ec2_instances(session: boto3.Session):
-    return [instance for reservations in session.client('ec2').describe_instances(
-            Filters=[
-                {
-                    'Name': 'instance-state-name',
-                    'Values': ['running']
-                }
-            ]
-            )['Reservations'] for instance in reservations['Instances']]
+def get_all_running_ec2_instances(session: boto3.Session, spot_instance: bool = False):
+    instances = []
+    paginator = session.client('ec2').get_paginator('describe_instances')
+    running_filter = {'Name': 'instance-state-name', 'Values': ['running']}
+
+    for page in paginator.paginate(Filters=[running_filter]):
+        for res in page['Reservations']:
+            instances += list(filter(lambda inst: ('SpotInstanceRequestId' in inst) == spot_instance, res['Instances']))  
+
+    return instances
+
+
+def count_vcpus_for_instance_types(instances, instance_types):
+    vcpu_count = 0
+    for inst in instances:
+        if inst['InstanceType'].startswith(instance_types):
+            vcpu_count += inst['CpuOptions']['CoreCount'] * inst['CpuOptions']['ThreadsPerCore']
+
+    return vcpu_count
 
 
 @cachetools.cached(cache=cachetools.TTLCache(1, 60))
@@ -32,8 +42,7 @@ class OnDemandStandardInstanceCountCheck(QuotaCheck):
     @property
     def current(self):
         instances = get_all_running_ec2_instances(self.boto_session)
-
-        return len(list(filter(lambda inst: inst['InstanceType'][0] in ['a', 'c', 'd', 'h', 'i', 'm', 'r', 't', 'z'], instances)))
+        return count_vcpus_for_instance_types(instances, ('a', 'c', 'd', 'h', 'i', 'm', 'r', 't', 'z'))
 
 
 class OnDemandFInstanceCountCheck(QuotaCheck):
@@ -46,8 +55,7 @@ class OnDemandFInstanceCountCheck(QuotaCheck):
     @property
     def current(self):
         instances = get_all_running_ec2_instances(self.boto_session)
-
-        return len(list(filter(lambda inst: inst['InstanceType'][0] in ['f'], instances)))
+        return count_vcpus_for_instance_types(instances, ('f'))
 
 
 class OnDemandGInstanceCountCheck(QuotaCheck):
@@ -60,8 +68,7 @@ class OnDemandGInstanceCountCheck(QuotaCheck):
     @property
     def current(self):
         instances = get_all_running_ec2_instances(self.boto_session)
-
-        return len(list(filter(lambda inst: inst['InstanceType'][0] in ['g'], instances)))
+        return count_vcpus_for_instance_types(instances, ('g'))
 
 
 class OnDemandInfInstanceCountCheck(QuotaCheck):
@@ -74,8 +81,7 @@ class OnDemandInfInstanceCountCheck(QuotaCheck):
     @property
     def current(self):
         instances = get_all_running_ec2_instances(self.boto_session)
-
-        return len(list(filter(lambda inst: inst['InstanceType'][0] in ['inf'], instances)))
+        return count_vcpus_for_instance_types(instances, ('inf'))
 
 
 class OnDemandPInstanceCountCheck(QuotaCheck):
@@ -88,8 +94,7 @@ class OnDemandPInstanceCountCheck(QuotaCheck):
     @property
     def current(self):
         instances = get_all_running_ec2_instances(self.boto_session)
-
-        return len(list(filter(lambda inst: inst['InstanceType'][0] in ['p'], instances)))
+        return count_vcpus_for_instance_types(instances, ('p'))
 
 
 class OnDemandXInstanceCountCheck(QuotaCheck):
@@ -102,8 +107,7 @@ class OnDemandXInstanceCountCheck(QuotaCheck):
     @property
     def current(self):
         instances = get_all_running_ec2_instances(self.boto_session)
-
-        return len(list(filter(lambda inst: inst['InstanceType'][0] in ['x'], instances)))
+        return count_vcpus_for_instance_types(instances, ('x'))
 
 
 class SpotStandardRequestCountCheck(QuotaCheck):
@@ -115,9 +119,8 @@ class SpotStandardRequestCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        requests = get_all_spot_requests(self.boto_session)
-
-        return len(list(filter(lambda inst: inst['LaunchSpecification']['InstanceType'][0] in ['a', 'c', 'd', 'h', 'i', 'm', 'r', 't', 'z'], requests)))
+        instances = get_all_running_ec2_instances(self.boto_session, True)
+        return count_vcpus_for_instance_types(instances, ('a', 'c', 'd', 'h', 'i', 'm', 'r', 't', 'z'))
 
 
 class SpotFRequestCountCheck(QuotaCheck):
@@ -129,9 +132,8 @@ class SpotFRequestCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        requests = get_all_spot_requests(self.boto_session)
-
-        return len(list(filter(lambda inst: inst['LaunchSpecification']['InstanceType'][0] in ['f'], requests)))
+        instances = get_all_running_ec2_instances(self.boto_session, True)
+        return count_vcpus_for_instance_types(instances, ('f'))
 
 
 class SpotGRequestCountCheck(QuotaCheck):
@@ -143,9 +145,8 @@ class SpotGRequestCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        requests = get_all_spot_requests(self.boto_session)
-
-        return len(list(filter(lambda inst: inst['LaunchSpecification']['InstanceType'][0] in ['g'], requests)))
+        instances = get_all_running_ec2_instances(self.boto_session, True)
+        return count_vcpus_for_instance_types(instances, ('g'))
 
 
 class SpotInfRequestCountCheck(QuotaCheck):
@@ -157,9 +158,8 @@ class SpotInfRequestCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        requests = get_all_spot_requests(self.boto_session)
-
-        return len(list(filter(lambda inst: inst['LaunchSpecification']['InstanceType'][0] in ['inf'], requests)))
+        instances = get_all_running_ec2_instances(self.boto_session, True)
+        return count_vcpus_for_instance_types(instances, ('inf'))
 
 
 class SpotPRequestCountCheck(QuotaCheck):
@@ -171,9 +171,8 @@ class SpotPRequestCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        requests = get_all_spot_requests(self.boto_session)
-
-        return len(list(filter(lambda inst: inst['LaunchSpecification']['InstanceType'][0] in ['p'], requests)))
+        instances = get_all_running_ec2_instances(self.boto_session, True)
+        return count_vcpus_for_instance_types(instances, ('p'))
 
 
 class SpotXRequestCountCheck(QuotaCheck):
@@ -185,9 +184,8 @@ class SpotXRequestCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        requests = get_all_spot_requests(self.boto_session)
-
-        return len(list(filter(lambda inst: inst['LaunchSpecification']['InstanceType'][0] in ['x'], requests)))
+        instances = get_all_running_ec2_instances(self.boto_session, True)
+        return count_vcpus_for_instance_types(instances, ('x'))
 
 
 class ElasticIpCountCheck(QuotaCheck):
