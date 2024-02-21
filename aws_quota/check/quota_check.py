@@ -3,6 +3,7 @@ import enum
 import typing
 
 import boto3
+from botocore.config import Config
 
 
 class QuotaScope(enum.Enum):
@@ -19,12 +20,20 @@ class QuotaCheck:
     quota_code: str = None
     warning_threshold: float = None
     error_threshold: float = None
+    # retries are needed to handle rate limitting
+    # https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html
+    retry_attempts: int = 15
 
     def __init__(self, boto_session: boto3.Session) -> None:
         super().__init__()
 
         self.boto_session = boto_session
-        self.sq_client = boto_session.client('service-quotas')
+        self.sq_client = boto_session.client('service-quotas', config=Config(
+            retries = {
+                'max_attempts': self.retry_attempts,
+                'mode': 'standard'
+            }
+        ))
 
     def __str__(self) -> str:
         return f'{self.key}{self.label_values}'
