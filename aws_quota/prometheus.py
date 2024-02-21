@@ -1,6 +1,6 @@
 import asyncio
 from aws_quota.exceptions import InstanceWithIdentifierNotFound
-from aws_quota.utils import get_account_id
+from aws_quota.utils import get_account_id, short_exception
 import dataclasses
 import logging
 import signal
@@ -9,7 +9,6 @@ import contextlib
 import typing
 
 from aws_quota.check.quota_check import InstanceQuotaCheck, QuotaCheck
-from utils import short_exception
 
 import boto3
 import prometheus_client as prom
