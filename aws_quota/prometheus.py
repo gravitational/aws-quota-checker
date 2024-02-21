@@ -9,6 +9,7 @@ import contextlib
 import typing
 
 from aws_quota.check.quota_check import InstanceQuotaCheck, QuotaCheck
+from utils import short_exception
 
 import boto3
 import prometheus_client as prom
@@ -101,8 +102,8 @@ class PrometheusExporter:
                                 )
                         else:
                             checks.append(chk(self.session))
-                    except Exception:
-                        logger.error('failed to collect check %s', chk)
+                    except Exception as e:
+                        logger.error('failed to collect check %s (%s)', chk, short_exception(e))
 
                 g.set(len(checks))
                 self.checks = checks
@@ -139,9 +140,9 @@ class PrometheusExporter:
                         logger.warn(
                             'instance with identifier %s does not exist anymore, dropping it...', e.check.instance_id)
                         checks_to_drop.append(e.check)
-                    except Exception:
+                    except Exception as e:
                         logger.error(
-                            'getting maximum of quota %s failed', check)
+                            'getting maximum of quota %s failed (%s)', check, short_exception(e))
 
                 for check in checks_to_drop:
                     self.checks.remove(check)
@@ -179,9 +180,9 @@ class PrometheusExporter:
                         logger.warn(
                             'instance with identifier %s does not exist anymore, dropping it...', e.check.instance_id)
                         checks_to_drop.append(e.check)
-                    except Exception:
+                    except Exception as e:
                         logger.error(
-                            'getting current value of quota %s failed', check)
+                            'getting current value of quota %s failed (%s)', check, short_exception(e))
 
                 for check in checks_to_drop:
                     self.checks.remove(check)
