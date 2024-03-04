@@ -1,4 +1,5 @@
 from .appmesh import *
+from .athena import *
 from .autoscaling import *
 from .cloudformation import *
 from .dynamodb import *

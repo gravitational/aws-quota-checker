@@ -11,7 +11,6 @@ class AthenaActiveDDLQueries(QuotaCheck):
     ## Current usage can be found in CloudWatch under:
     ## [ "AWS/Usage", "ResourceCount", "Type", "Resource", "Resource", "ActiveQueryCount", "Service", "Athena", "Class", "DDL" ]
 
-
 class AthenaActiveDMLQueries(QuotaCheck):
     key = "athena_actvice_dml_queries_count"
     description = "The number of active DML queries. DML queries include SELECT, CREATE TABLE AS (CTAS), and INSERT INTO queries. The specific quotas vary by AWS Region."
