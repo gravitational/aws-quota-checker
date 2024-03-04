@@ -1,9 +1,26 @@
+import cachetools
 from aws_quota.exceptions import InstanceWithIdentifierNotFound
 import typing
 
 import boto3
 from .quota_check import QuotaCheck, InstanceQuotaCheck, QuotaScope
 
+
+@cachetools.cached(cache=cachetools.TTLCache(maxsize=1, ttl=60))
+def get_all_sns_topic_arns(session: boto3.Session) -> typing.List[str]:
+    print("called list topics")
+    paginator = session.client('sns').get_paginator('list_topics')
+    topic_arns: typing.List = []
+    for page in paginator.paginate():
+        for arn in page['Topics']:
+            topic_arns.append(arn['TopicArn'])
+
+    return topic_arns
+
+@cachetools.cached(cache=cachetools.TTLCache(maxsize=3000, ttl=60))
+def get_topic_attributes(session: boto3.Session, topic_arn) -> typing.List[str]:
+    print("called get attributes {}".format(topic_arn))
+    return session.client('sns').get_topic_attributes(TopicArn=topic_arn)
 
 class TopicCountCheck(QuotaCheck):
     key = "sns_topics_count"
@@ -14,7 +31,7 @@ class TopicCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('sns').list_topics()['Topics'])
+        return len(get_all_sns_topic_arns(self.boto_session))
 
 class PendingSubscriptionCountCheck(QuotaCheck):
     key = "sns_pending_subscriptions_count"
@@ -25,13 +42,15 @@ class PendingSubscriptionCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        all_topic_arns = SubscriptionsPerTopicCheck.get_all_identifiers(self.boto_session)
+        print("list all")
+        all_topic_arns = get_all_sns_topic_arns(self.boto_session)
         pending_subs = 0
 
         for arn in all_topic_arns:
-            pending_subs += int(self.boto_session.client('sns').get_topic_attributes(TopicArn=arn)['Attributes']['SubscriptionsPending'])
+            pending_subs += int(get_topic_attributes(self.boto_session, arn)['Attributes']['SubscriptionsPending'])
 
         return pending_subs
+
 
 class SubscriptionsPerTopicCheck(InstanceQuotaCheck):
     key = "sns_subscriptions_per_topic"
@@ -42,12 +61,13 @@ class SubscriptionsPerTopicCheck(InstanceQuotaCheck):
 
     @staticmethod
     def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
-        return [topic['TopicArn'] for topic in session.client('sns').list_topics()['Topics']]
+        print("list all")
+        return get_all_sns_topic_arns(session)
 
     @property
     def current(self):
         try:
-            topic_attrs = self.boto_session.client('sns').get_topic_attributes(TopicArn=self.instance_id)['Attributes']
+            topic_attrs = get_topic_attributes(self.boto_session, self.instance_id)['Attributes']
         except self.boto_session.client('sns').exceptions.NotFoundException as e:
             raise InstanceWithIdentifierNotFound(self) from e
 
