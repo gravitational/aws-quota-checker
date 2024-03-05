@@ -10,6 +10,7 @@ from .eks import *
 from .elasticbeanstalk import *
 from .elb import *
 from .iam import *
+from .kms import *
 from .lambdas import *
 from .rds import *
 from .route53 import *

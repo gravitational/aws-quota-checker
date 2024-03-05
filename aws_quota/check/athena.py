@@ -1,3 +1,4 @@
+from aws_quota.exceptions import NotImplementedInFavourOfCloudWatch
 from .quota_check import QuotaCheck, QuotaScope
 
 
@@ -8,8 +9,11 @@ class AthenaActiveDDLQueries(QuotaCheck):
     service_code = 'athena'
     quota_code = 'L-3CE0BBA0'
 
-    ## Current usage can be found in CloudWatch under:
-    ## [ "AWS/Usage", "ResourceCount", "Type", "Resource", "Resource", "ActiveQueryCount", "Service", "Athena", "Class", "DDL" ]
+    @property
+    def current(self):
+        ## Current usage can be found in CloudWatch under:
+        ## [ "AWS/Usage", "ResourceCount", "Type", "Resource", "Resource", "ActiveQueryCount", "Service", "Athena", "Class", "DDL" ]
+        raise NotImplementedInFavourOfCloudWatch(self)
 
 class AthenaActiveDMLQueries(QuotaCheck):
     key = "athena_actvice_dml_queries_count"
@@ -18,5 +22,10 @@ class AthenaActiveDMLQueries(QuotaCheck):
     service_code = 'athena'
     quota_code = 'L-FC5F6546'
 
-    ## Current usage can be found in CloudWatch under:
-    ## [ "AWS/Usage", "ResourceCount", "Type", "Resource", "Resource", "ActiveQueryCount", "Service", "Athena", "Class", "DML" ]
+
+    @property
+    def current(self):
+        ## Current usage can be found in CloudWatch under:
+        ## [ "AWS/Usage", "ResourceCount", "Type", "Resource", "Resource", "ActiveQueryCount", "Service", "Athena", "Class", "DML" ]
+        raise NotImplementedInFavourOfCloudWatch(self)
+    
