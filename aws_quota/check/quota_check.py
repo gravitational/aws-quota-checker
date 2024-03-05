@@ -52,7 +52,10 @@ class QuotaCheck:
             label_values['region'] = self.boto_session.region_name
 
         if self.scope == QuotaScope.INSTANCE:
-            label_values['instance'] = self.instance_id
+            if isinstance(self.instance_id, dict):
+                label_values.update(self.instance_id)
+            else:
+                label_values['instance'] = self.instance_id
 
         return label_values
 
