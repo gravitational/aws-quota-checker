@@ -1,20 +1,14 @@
 import cachetools
 from aws_quota.exceptions import InstanceWithIdentifierNotFound
+from aws_quota.utils import get_paginated_results
 import typing
-
 import boto3
 from .quota_check import QuotaCheck, InstanceQuotaCheck, QuotaScope
 
 
 @cachetools.cached(cache=cachetools.TTLCache(maxsize=1, ttl=60))
 def get_all_sns_topic_arns(session: boto3.Session) -> typing.List[str]:
-    paginator = session.client('sns').get_paginator('list_topics')
-    topic_arns: typing.List = []
-    for page in paginator.paginate():
-        for arn in page['Topics']:
-            topic_arns.append(arn['TopicArn'])
-
-    return topic_arns
+    return [topic['TopicArn'] for topic in get_paginated_results(session, 'sns', 'list_topics', 'Topics')]
 
 @cachetools.cached(cache=cachetools.TTLCache(maxsize=3000, ttl=60))
 def get_topic_attributes(session: boto3.Session, topic_arn) -> typing.List[str]:

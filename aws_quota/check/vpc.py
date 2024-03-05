@@ -1,10 +1,10 @@
+from .quota_check import QuotaCheck, InstanceQuotaCheck, QuotaScope
 from aws_quota.exceptions import InstanceWithIdentifierNotFound
-import typing
-
+from aws_quota.utils import get_paginated_results
 import boto3
 import botocore.exceptions
 import cachetools
-from .quota_check import QuotaCheck, InstanceQuotaCheck, QuotaScope
+import typing
 
 
 def check_if_vpc_exists(session: boto3.Session, vpc_id: str) -> bool:
@@ -18,13 +18,7 @@ def check_if_vpc_exists(session: boto3.Session, vpc_id: str) -> bool:
 
 @cachetools.cached(cache=cachetools.TTLCache(1, 60))
 def get_all_vpcs(session: boto3.Session) -> typing.List[dict]:
-    vpcs = []
-    paginator = session.client('ec2').get_paginator('describe_vpcs')
-
-    for page in paginator.paginate():
-        vpcs += page['Vpcs']
-
-    return vpcs
+    return get_paginated_results(session, 'ec2', 'describe_vpcs', 'Vpcs')
 
 
 def get_vpc_by_id(session: boto3.Session, vpc_id: str) -> dict:
@@ -43,13 +37,7 @@ def get_vpc_peering_connections(session: boto3.Session) -> typing.List[dict]:
 
 @cachetools.cached(cache=cachetools.TTLCache(1, 60))
 def get_all_sgs(session: boto3.Session) -> typing.List[dict]:
-    sgs = []
-    paginator = session.client('ec2').get_paginator('describe_security_groups')
-
-    for page in paginator.paginate():
-        sgs += page['SecurityGroups']
-
-    return sgs
+    return get_paginated_results(session, 'ec2', 'describe_security_groups', 'SecurityGroups')
 
 
 def get_sg_by_id(session: boto3.Session, sg_id: str) -> dict:

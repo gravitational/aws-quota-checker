@@ -1,4 +1,4 @@
-from aws_quota.utils import get_account_id
+from aws_quota.utils import get_account_id, get_paginated_results
 import enum
 import typing
 
@@ -39,9 +39,7 @@ class QuotaCheck:
         return f'{self.key}{self.label_values}'
 
     def count_paginated_results(self, service: str, method: str, key: str, paginate_args: dict = {}) -> int:
-        paginator = self.boto_session.client(service).get_paginator(method)
-        page_iterable = paginator.paginate(**paginate_args)
-        return sum(len(page[key]) for page in page_iterable)
+        return len(get_paginated_results(self.boto_session, service, method, key, paginate_args))
 
     @property
     def label_values(self):
