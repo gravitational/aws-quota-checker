@@ -8,7 +8,6 @@ from .quota_check import QuotaCheck, InstanceQuotaCheck, QuotaScope
 
 @cachetools.cached(cache=cachetools.TTLCache(maxsize=1, ttl=60))
 def get_all_sns_topic_arns(session: boto3.Session) -> typing.List[str]:
-    print("called list topics")
     paginator = session.client('sns').get_paginator('list_topics')
     topic_arns: typing.List = []
     for page in paginator.paginate():
@@ -19,7 +18,6 @@ def get_all_sns_topic_arns(session: boto3.Session) -> typing.List[str]:
 
 @cachetools.cached(cache=cachetools.TTLCache(maxsize=3000, ttl=60))
 def get_topic_attributes(session: boto3.Session, topic_arn) -> typing.List[str]:
-    print("called get attributes {}".format(topic_arn))
     return session.client('sns').get_topic_attributes(TopicArn=topic_arn)
 
 class TopicCountCheck(QuotaCheck):
@@ -42,7 +40,6 @@ class PendingSubscriptionCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        print("list all")
         all_topic_arns = get_all_sns_topic_arns(self.boto_session)
         pending_subs = 0
 
@@ -61,7 +58,6 @@ class SubscriptionsPerTopicCheck(InstanceQuotaCheck):
 
     @staticmethod
     def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
-        print("list all")
         return get_all_sns_topic_arns(session)
 
     @property

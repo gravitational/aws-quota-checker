@@ -10,4 +10,4 @@ class StackCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('cloudformation').list_stacks()['StackSummaries'])
+        return self.count_paginated_results("cloudformation", "list_stacks", "StackSummaries")

@@ -1,9 +1,13 @@
+import cachetools
 from aws_quota.exceptions import InstanceWithIdentifierNotFound
 import typing
 
 import boto3
 from .quota_check import InstanceQuotaCheck, QuotaCheck, QuotaScope
 
+@cachetools.cached(cache=cachetools.TTLCache(1, 60))
+def iam_account_summary(session: boto3.Session):
+    return session.client('iam').get_account_summary()
 
 class GroupCountCheck(QuotaCheck):
     key = "iam_group_count"
@@ -12,11 +16,11 @@ class GroupCountCheck(QuotaCheck):
 
     @property
     def maximum(self):
-        return self.boto_session.client('iam').get_account_summary()['SummaryMap']['GroupsQuota']
+        return iam_account_summary(self.boto_session)['SummaryMap']['GroupsQuota']
 
     @property
     def current(self):
-        return self.boto_session.client('iam').get_account_summary()['SummaryMap']['Groups']
+        return iam_account_summary(self.boto_session)['SummaryMap']['Groups']
 
 
 class UsersCountCheck(QuotaCheck):
@@ -26,11 +30,11 @@ class UsersCountCheck(QuotaCheck):
 
     @property
     def maximum(self):
-        return self.boto_session.client('iam').get_account_summary()['SummaryMap']['UsersQuota']
+        return iam_account_summary(self.boto_session)['SummaryMap']['UsersQuota']
 
     @property
     def current(self):
-        return self.boto_session.client('iam').get_account_summary()['SummaryMap']['Users']
+        return iam_account_summary(self.boto_session)['SummaryMap']['Users']
 
 
 class PolicyCountCheck(QuotaCheck):
@@ -40,11 +44,11 @@ class PolicyCountCheck(QuotaCheck):
 
     @property
     def maximum(self):
-        return self.boto_session.client('iam').get_account_summary()['SummaryMap']['PoliciesQuota']
+        return iam_account_summary(self.boto_session)['SummaryMap']['PoliciesQuota']
 
     @property
     def current(self):
-        return self.boto_session.client('iam').get_account_summary()['SummaryMap']['Policies']
+        return iam_account_summary(self.boto_session)['SummaryMap']['Policies']
 
 
 class PolicyVersionCountCheck(QuotaCheck):
@@ -54,11 +58,11 @@ class PolicyVersionCountCheck(QuotaCheck):
 
     @property
     def maximum(self):
-        return self.boto_session.client('iam').get_account_summary()['SummaryMap']['PolicyVersionsInUseQuota']
+        return iam_account_summary(self.boto_session)['SummaryMap']['PolicyVersionsInUseQuota']
 
     @property
     def current(self):
-        return self.boto_session.client('iam').get_account_summary()['SummaryMap']['PolicyVersionsInUse']
+        return iam_account_summary(self.boto_session)['SummaryMap']['PolicyVersionsInUse']
 
 
 class ServerCertificateCountCheck(QuotaCheck):
@@ -68,11 +72,11 @@ class ServerCertificateCountCheck(QuotaCheck):
 
     @property
     def maximum(self):
-        return self.boto_session.client('iam').get_account_summary()['SummaryMap']['ServerCertificatesQuota']
+        return iam_account_summary(self.boto_session)['SummaryMap']['ServerCertificatesQuota']
 
     @property
     def current(self):
-        return self.boto_session.client('iam').get_account_summary()['SummaryMap']['ServerCertificates']
+        return iam_account_summary(self.boto_session)['SummaryMap']['ServerCertificates']
 
 
 class AttachedPolicyPerUserCheck(InstanceQuotaCheck):
@@ -86,7 +90,7 @@ class AttachedPolicyPerUserCheck(InstanceQuotaCheck):
 
     @property
     def maximum(self):
-        return self.boto_session.client('iam').get_account_summary()['SummaryMap']['AttachedPoliciesPerUserQuota']
+        return iam_account_summary(self.boto_session)['SummaryMap']['AttachedPoliciesPerUserQuota']
 
     @property
     def current(self):
@@ -106,7 +110,7 @@ class AttachedPolicyPerGroupCheck(InstanceQuotaCheck):
 
     @property
     def maximum(self):
-        return self.boto_session.client('iam').get_account_summary()['SummaryMap']['AttachedPoliciesPerGroupQuota']
+        return iam_account_summary(self.boto_session)['SummaryMap']['AttachedPoliciesPerGroupQuota']
 
     @property
     def current(self):
@@ -126,7 +130,7 @@ class AttachedPolicyPerRoleCheck(InstanceQuotaCheck):
 
     @property
     def maximum(self):
-        return self.boto_session.client('iam').get_account_summary()['SummaryMap']['AttachedPoliciesPerRoleQuota']
+        return iam_account_summary(self.boto_session)['SummaryMap']['AttachedPoliciesPerRoleQuota']
 
     @property
     def current(self):
@@ -144,12 +148,8 @@ class RoleCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        paginator = self.boto_session.client('iam').get_paginator('list_roles')
-        return sum([len(page['Roles']) for page in paginator.paginate()])
+        return iam_account_summary(self.boto_session)['SummaryMap']['Roles']
 
     @property
     def maximum(self) -> int:
-        try:
-            return super().maximum
-        except self.sq_client.exceptions.NoSuchResourceException:
-            return 1000
+        return iam_account_summary(self.boto_session)['SummaryMap']['RolesQuota']

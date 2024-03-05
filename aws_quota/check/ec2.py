@@ -209,7 +209,7 @@ class TransitGatewayCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('ec2').describe_transit_gateways()['TransitGateways'])
+        return self.count_paginated_results("ec2", "describe_transit_gateways", "TransitGateways")
 
 
 class VpnConnectionCountCheck(QuotaCheck):
@@ -222,3 +222,14 @@ class VpnConnectionCountCheck(QuotaCheck):
     @property
     def current(self):
         return len(self.boto_session.client('ec2').describe_vpn_connections()['VpnConnections'])
+
+class LaunchTemplatesCount(QuotaCheck):
+    key = "launch_templates_count"
+    description = "Maximum number of launch templates per Region per account."
+    scope = QuotaScope.REGION
+    service_code = 'ec2'
+    quota_code = 'L-FB451C26'
+
+    @property
+    def current(self):
+        return self.count_paginated_results("ec2", "describe_launch_templates", "LaunchTemplates")

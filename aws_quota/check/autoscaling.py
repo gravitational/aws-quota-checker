@@ -10,7 +10,7 @@ class AutoScalingGroupCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('autoscaling').describe_auto_scaling_groups()['AutoScalingGroups'])
+        return self.count_paginated_results("autoscaling", "describe_auto_scaling_groups", "AutoScalingGroups")
 
 
 class LaunchConfigurationCountCheck(QuotaCheck):
@@ -22,4 +22,4 @@ class LaunchConfigurationCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('autoscaling').describe_launch_configurations()['LaunchConfigurations'])
+        return self.count_paginated_results("autoscaling", "describe_launch_configurations", "LaunchConfigurations")
