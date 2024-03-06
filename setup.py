@@ -20,7 +20,7 @@ setup(
     extras_require={
         'dev':{
             'autopep8',
-            'pylint',
+            'ruff',
             'keepachangelog',
             'wheel'
         },
