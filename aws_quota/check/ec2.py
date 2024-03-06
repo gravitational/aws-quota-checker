@@ -1,3 +1,4 @@
+from typing import List
 from .quota_check import QuotaCheck, QuotaScope
 
 import boto3
@@ -5,17 +6,22 @@ import cachetools
 
 
 @cachetools.cached(cache=cachetools.TTLCache(1, 60))
-def get_all_running_ec2_instances(session: boto3.Session, spot_instance: bool = False):
+def get_all_running_ec2_instances(session: boto3.Session):
     instances = []
     paginator = session.client('ec2').get_paginator('describe_instances')
-    running_filter = {'Name': 'instance-state-name', 'Values': ['running']}
+    filters = [{'Name': 'instance-state-name', 'Values': ['running']}]
 
-    for page in paginator.paginate(Filters=[running_filter]):
+    for page in paginator.paginate(Filters=filters):
         for res in page['Reservations']:
-            instances += list(filter(lambda inst: ('SpotInstanceRequestId' in inst) == spot_instance, res['Instances']))  
+            instances += res['Instances']
 
     return instances
 
+def get_running_on_demand_ec2_instances(session: boto3.Session):
+    return list(filter(lambda inst: 'SpotInstanceRequestId' not in inst, get_all_running_ec2_instances(session)))
+
+def get_running_spot_ec2_instances(session: boto3.Session):
+    return list(filter(lambda inst: 'SpotInstanceRequestId' in inst, get_all_running_ec2_instances(session)))
 
 def count_vcpus_for_instance_types(instances, instance_types):
     vcpu_count = 0
@@ -41,7 +47,7 @@ class OnDemandStandardInstanceCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        instances = get_all_running_ec2_instances(self.boto_session)
+        instances = get_running_on_demand_ec2_instances(self.boto_session)
         return count_vcpus_for_instance_types(instances, ('a', 'c', 'd', 'h', 'i', 'm', 'r', 't', 'z'))
 
 
@@ -54,7 +60,7 @@ class OnDemandFInstanceCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        instances = get_all_running_ec2_instances(self.boto_session)
+        instances = get_running_on_demand_ec2_instances(self.boto_session)
         return count_vcpus_for_instance_types(instances, ('f'))
 
 
@@ -67,7 +73,7 @@ class OnDemandGInstanceCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        instances = get_all_running_ec2_instances(self.boto_session)
+        instances = get_running_on_demand_ec2_instances(self.boto_session)
         return count_vcpus_for_instance_types(instances, ('g'))
 
 
@@ -80,7 +86,7 @@ class OnDemandInfInstanceCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        instances = get_all_running_ec2_instances(self.boto_session)
+        instances = get_running_on_demand_ec2_instances(self.boto_session)
         return count_vcpus_for_instance_types(instances, ('inf'))
 
 
@@ -93,7 +99,7 @@ class OnDemandPInstanceCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        instances = get_all_running_ec2_instances(self.boto_session)
+        instances = get_running_on_demand_ec2_instances(self.boto_session)
         return count_vcpus_for_instance_types(instances, ('p'))
 
 
@@ -106,7 +112,7 @@ class OnDemandXInstanceCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        instances = get_all_running_ec2_instances(self.boto_session)
+        instances = get_running_on_demand_ec2_instances(self.boto_session)
         return count_vcpus_for_instance_types(instances, ('x'))
 
 
@@ -119,7 +125,7 @@ class SpotStandardRequestCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        instances = get_all_running_ec2_instances(self.boto_session, True)
+        instances = get_running_spot_ec2_instances(self.boto_session)
         return count_vcpus_for_instance_types(instances, ('a', 'c', 'd', 'h', 'i', 'm', 'r', 't', 'z'))
 
 
@@ -132,7 +138,7 @@ class SpotFRequestCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        instances = get_all_running_ec2_instances(self.boto_session, True)
+        instances = get_running_spot_ec2_instances(self.boto_session)
         return count_vcpus_for_instance_types(instances, ('f'))
 
 
@@ -145,7 +151,7 @@ class SpotGRequestCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        instances = get_all_running_ec2_instances(self.boto_session, True)
+        instances = get_running_spot_ec2_instances(self.boto_session)
         return count_vcpus_for_instance_types(instances, ('g'))
 
 
@@ -158,7 +164,7 @@ class SpotInfRequestCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        instances = get_all_running_ec2_instances(self.boto_session, True)
+        instances = get_running_spot_ec2_instances(self.boto_session)
         return count_vcpus_for_instance_types(instances, ('inf'))
 
 
@@ -171,7 +177,7 @@ class SpotPRequestCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        instances = get_all_running_ec2_instances(self.boto_session, True)
+        instances = get_running_spot_ec2_instances(self.boto_session)
         return count_vcpus_for_instance_types(instances, ('p'))
 
 
@@ -184,7 +190,7 @@ class SpotXRequestCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        instances = get_all_running_ec2_instances(self.boto_session, True)
+        instances = get_running_spot_ec2_instances(self.boto_session)
         return count_vcpus_for_instance_types(instances, ('x'))
 
 
@@ -209,7 +215,7 @@ class TransitGatewayCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('ec2').describe_transit_gateways()['TransitGateways'])
+        return self.count_paginated_results("ec2", "describe_transit_gateways", "TransitGateways")
 
 
 class VpnConnectionCountCheck(QuotaCheck):
@@ -222,3 +228,14 @@ class VpnConnectionCountCheck(QuotaCheck):
     @property
     def current(self):
         return len(self.boto_session.client('ec2').describe_vpn_connections()['VpnConnections'])
+
+class LaunchTemplatesCount(QuotaCheck):
+    key = "launch_templates_count"
+    description = "Maximum number of launch templates per Region per account."
+    scope = QuotaScope.REGION
+    service_code = 'ec2'
+    quota_code = 'L-FB451C26'
+
+    @property
+    def current(self):
+        return self.count_paginated_results("ec2", "describe_launch_templates", "LaunchTemplates")

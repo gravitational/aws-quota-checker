@@ -1,10 +1,10 @@
+from .quota_check import QuotaCheck, InstanceQuotaCheck, QuotaScope
 from aws_quota.exceptions import InstanceWithIdentifierNotFound
-import typing
-
+from aws_quota.utils import get_paginated_results
 import boto3
 import botocore.exceptions
 import cachetools
-from .quota_check import QuotaCheck, InstanceQuotaCheck, QuotaScope
+import typing
 
 
 def check_if_vpc_exists(session: boto3.Session, vpc_id: str) -> bool:
@@ -18,7 +18,7 @@ def check_if_vpc_exists(session: boto3.Session, vpc_id: str) -> bool:
 
 @cachetools.cached(cache=cachetools.TTLCache(1, 60))
 def get_all_vpcs(session: boto3.Session) -> typing.List[dict]:
-    return session.client('ec2').describe_vpcs()['Vpcs']
+    return get_paginated_results(session, 'ec2', 'describe_vpcs', 'Vpcs')
 
 
 def get_vpc_by_id(session: boto3.Session, vpc_id: str) -> dict:
@@ -37,7 +37,7 @@ def get_vpc_peering_connections(session: boto3.Session) -> typing.List[dict]:
 
 @cachetools.cached(cache=cachetools.TTLCache(1, 60))
 def get_all_sgs(session: boto3.Session) -> typing.List[dict]:
-    return session.client('ec2').describe_security_groups()['SecurityGroups']
+    return get_paginated_results(session, 'ec2', 'describe_security_groups', 'SecurityGroups')
 
 
 def get_sg_by_id(session: boto3.Session, sg_id: str) -> dict:
@@ -85,7 +85,7 @@ class InternetGatewayCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('ec2').describe_internet_gateways()['InternetGateways'])
+        return self.count_paginated_results("ec2", "describe_internet_gateways", "InternetGateways")
 
 class VpcEndpointCountCheck(QuotaCheck):
     key = "vpc_endpoint"
@@ -96,7 +96,7 @@ class VpcEndpointCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('ec2').describe_vpc_endpoints()['VpcEndpoints'])
+        return self.count_paginated_results("ec2", "describe_vpc_endpoints", "VpcEndpoints")
 
 class NetworkInterfaceCountCheck(QuotaCheck):
     key = "ni_count"
@@ -107,7 +107,7 @@ class NetworkInterfaceCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('ec2').describe_network_interfaces()['NetworkInterfaces'])
+        return self.count_paginated_results("ec2", "describe_network_interfaces", "NetworkInterfaces")
 
 
 class SecurityGroupCountCheck(QuotaCheck):
@@ -119,7 +119,7 @@ class SecurityGroupCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('ec2').describe_security_groups()['SecurityGroups'])
+        return len(get_all_sgs(self.boto_session))
 
 class NatGatewayCountCheck(QuotaCheck):
     key = "nat_count"
@@ -130,7 +130,7 @@ class NatGatewayCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('ec2').describe_nat_gateways()['NatGateways'])
+        return self.count_paginated_results("ec2", "describe_nat_gateways", "NatGateways")
 
 class RulesPerSecurityGroupCheck(InstanceQuotaCheck):
     key = "vpc_rules_per_sg"

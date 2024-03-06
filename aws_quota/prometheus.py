@@ -1,5 +1,5 @@
 import asyncio
-from aws_quota.exceptions import InstanceWithIdentifierNotFound
+from aws_quota.exceptions import InstanceWithIdentifierNotFound, NotImplementedInFavourOfCloudWatch
 from aws_quota.utils import get_account_id, short_exception
 import dataclasses
 import logging
@@ -179,6 +179,8 @@ class PrometheusExporter:
                         logger.warn(
                             'instance with identifier %s does not exist anymore, dropping it...', e.check.instance_id)
                         checks_to_drop.append(e.check)
+                    except NotImplementedInFavourOfCloudWatch as e:
+                        logger.debug('(%s) not implemented, use CloudWatch metric instead', check)
                     except Exception as e:
                         logger.error(
                             'getting current value of quota %s failed (%s)', check, short_exception(e))

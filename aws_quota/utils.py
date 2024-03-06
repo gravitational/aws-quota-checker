@@ -14,3 +14,11 @@ def short_exception(exception: Exception) -> str:
     'BaseException: important error message'
     """
     return ''.join(traceback.format_exception_only(type(exception), exception)).rstrip()
+
+
+def get_paginated_results(session: boto3.Session, service: str, method: str, key: str, paginate_args: dict = {}) -> int:
+    paginator = session.client(service).get_paginator(method)
+    res = []
+    for page in paginator.paginate(**paginate_args):
+        res.extend(page[key])
+    return res

@@ -1,4 +1,4 @@
-from aws_quota.utils import get_account_id
+from aws_quota.utils import get_account_id, get_paginated_results
 import enum
 import typing
 
@@ -39,10 +39,7 @@ class QuotaCheck:
         return f'{self.key}{self.label_values}'
 
     def count_paginated_results(self, service: str, method: str, key: str, paginate_args: dict = {}) -> int:
-        paginator = self.boto_session.client(service).get_paginator(method)
-        pagination_config = {'PageSize': 100}
-        page_iterable = paginator.paginate(**{"PaginationConfig": pagination_config, **paginate_args})
-        return sum(len(page[key]) for page in page_iterable)
+        return len(get_paginated_results(self.boto_session, service, method, key, paginate_args))
 
     @property
     def label_values(self):
@@ -55,7 +52,10 @@ class QuotaCheck:
             label_values['region'] = self.boto_session.region_name
 
         if self.scope == QuotaScope.INSTANCE:
-            label_values['instance'] = self.instance_id
+            if isinstance(self.instance_id, dict):
+                label_values.update(self.instance_id)
+            else:
+                label_values['instance'] = self.instance_id
 
         return label_values
 

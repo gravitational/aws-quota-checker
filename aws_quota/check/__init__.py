@@ -1,4 +1,5 @@
 from .appmesh import *
+from .athena import *
 from .autoscaling import *
 from .cloudformation import *
 from .dynamodb import *
@@ -9,6 +10,7 @@ from .eks import *
 from .elasticbeanstalk import *
 from .elb import *
 from .iam import *
+from .kms import *
 from .lambdas import *
 from .rds import *
 from .route53 import *
