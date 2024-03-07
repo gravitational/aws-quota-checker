@@ -11,7 +11,7 @@ def check_if_vpc_exists(session: boto3.Session, vpc_id: str) -> bool:
     client = session.client('ec2')
     try:
         client.describe_vpcs(VpcIds=[vpc_id])
-    except botocore.exceptions.ClientError as e:
+    except botocore.exceptions.ClientError:
         return False
     return True
 
@@ -20,6 +20,29 @@ def check_if_vpc_exists(session: boto3.Session, vpc_id: str) -> bool:
 def get_all_vpcs(session: boto3.Session) -> typing.List[dict]:
     return get_paginated_results(session, 'ec2', 'describe_vpcs', 'Vpcs')
 
+@cachetools.cached(cache=cachetools.TTLCache(1, 60))
+def get_all_subnets(session: boto3.Session) -> typing.List[dict]:
+    return get_paginated_results(session, 'ec2', 'describe_subnets', 'Subnets')
+
+@cachetools.cached(cache=cachetools.TTLCache(1, 60))
+def get_all_nat_gateways(session: boto3.Session) -> typing.List[dict]:
+    return get_paginated_results(session, 'ec2', 'describe_nat_gateways', 'NatGateways')
+
+@cachetools.cached(cache=cachetools.TTLCache(10, 60))
+def count_nat_gateways_by_az(session: boto3.Session, az_name: str) -> int:
+    nat_count_by_az = {}
+    subnet_id_to_az = {}
+
+    for s in get_all_subnets(session):
+        az = s['AvailabilityZone']
+        nat_count_by_az[az] = 0
+        subnet_id_to_az[s['SubnetId']] = az
+
+    for nat in get_all_nat_gateways(session):
+        subnet = nat['SubnetId']
+        nat_count_by_az[subnet_id_to_az[subnet]] += 1
+
+    return nat_count_by_az.get(az_name)
 
 def get_vpc_by_id(session: boto3.Session, vpc_id: str) -> dict:
     try:
@@ -121,16 +144,21 @@ class SecurityGroupCountCheck(QuotaCheck):
     def current(self):
         return len(get_all_sgs(self.boto_session))
 
-class NatGatewayCountCheck(QuotaCheck):
+class NatGatewayCountCheck(InstanceQuotaCheck):
     key = "nat_count"
-    description = "NAT gateways per Region"
-    scope = QuotaScope.REGION
+    description = "The maximum number of NAT gateways per Availability Zone"
+    scope = QuotaScope.INSTANCE
     service_code = 'vpc'
     quota_code = 'L-FE5A380F'
+    instance_id = 'Availability Zone Name'
+
+    @staticmethod
+    def get_all_identifiers(session: boto3.Session) -> typing.Set[str]:
+        return set(s['AvailabilityZone'] for s in get_all_subnets(session))
 
     @property
     def current(self):
-        return self.count_paginated_results("ec2", "describe_nat_gateways", "NatGateways")
+        return count_nat_gateways_by_az(self.boto_session, self.instance_id)
 
 class RulesPerSecurityGroupCheck(InstanceQuotaCheck):
     key = "vpc_rules_per_sg"
