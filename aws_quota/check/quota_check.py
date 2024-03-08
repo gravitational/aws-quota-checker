@@ -11,7 +11,6 @@ class QuotaScope(enum.Enum):
     REGION = 1
     INSTANCE = 2
 
-
 class QuotaCheck:
     key: str = None
     description: str = None
@@ -46,7 +45,7 @@ class QuotaCheck:
         label_values = {
             'quota': self.key,
             'account': get_account_id(self.boto_session),
-            'scope': self.scope,
+            'scope': self.scope.name,
             'service_code': self.service_code,
             'quota_code': self.quota_code,
         }
