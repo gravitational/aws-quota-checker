@@ -45,7 +45,10 @@ class QuotaCheck:
     def label_values(self):
         label_values = {
             'quota': self.key,
-            'account': get_account_id(self.boto_session)
+            'account': get_account_id(self.boto_session),
+            'scope': self.scope,
+            'service_code': self.service_code,
+            'quota_code': self.quota_code,
         }
 
         if self.scope in (QuotaScope.REGION, QuotaScope.INSTANCE):
