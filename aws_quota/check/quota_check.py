@@ -11,11 +11,15 @@ from botocore.config import Config
 def get_service_quota_cache_key(sq_client, service_code, quota_code):
     return hashkey(service_code, quota_code)
 
+# create custom hash key that ignores boto client
+def get_default_service_quota_cache_key(sq_client, service_code, quota_code):
+    return hashkey("default", service_code, quota_code)
+
 @cachetools.cached(cache=cachetools.TTLCache(1000, 3600), key=get_service_quota_cache_key)
 def get_service_quota(sq_client: boto3.client, service_code, quota_code):
     return sq_client.get_service_quota(ServiceCode=service_code, QuotaCode=quota_code)['Quota']
 
-@cachetools.cached(cache=cachetools.TTLCache(1000, 3600), key=get_service_quota_cache_key)
+@cachetools.cached(cache=cachetools.TTLCache(1000, 3600), key=get_default_service_quota_cache_key)
 def get_default_service_quota(sq_client: boto3.client, service_code, quota_code):
     return sq_client.get_aws_default_service_quota(ServiceCode=service_code, QuotaCode=quota_code)['Quota']
 
