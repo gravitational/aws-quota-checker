@@ -3,10 +3,10 @@ from .quota_check import QuotaCheck, QuotaScope
 
 class StackCountCheck(QuotaCheck):
     key = "cf_stack_count"
-    description = "Cloud Formation Stack count"
     scope = QuotaScope.REGION
     service_code = 'cloudformation'
     quota_code = 'L-0485CB21'
+    description = "Maximum number of AWS CloudFormation stacks that you can create."
 
     @property
     def current(self):

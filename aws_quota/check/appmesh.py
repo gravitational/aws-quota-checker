@@ -3,10 +3,10 @@ from .quota_check import QuotaCheck, QuotaScope
 
 class MeshCountCheck(QuotaCheck):
     key = "am_mesh_count"
-    description = "App Meshes per Account"
     scope = QuotaScope.REGION
     service_code = 'appmesh'
     quota_code = 'L-AC861A39'
+    description = "Number of meshes per account"
 
     @property
     def current(self):

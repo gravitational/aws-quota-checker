@@ -89,10 +89,10 @@ def get_all_network_acls(session: boto3.Session) -> typing.List[dict]:
 
 class VpcCountCheck(QuotaCheck):
     key = "vpc_count"
-    description = "VPCs per Region"
     scope = QuotaScope.REGION
     service_code = 'vpc'
     quota_code = 'L-F678F1CE'
+    description = "The maximum number of VPCs per Region. This quota is directly tied to the maximum number of internet gateways per Region."
 
     @property
     def current(self):
@@ -101,10 +101,10 @@ class VpcCountCheck(QuotaCheck):
 
 class InternetGatewayCountCheck(QuotaCheck):
     key = "ig_count"
-    description = "VPC internet gateways per Region"
     scope = QuotaScope.REGION
     service_code = 'vpc'
     quota_code = 'L-A4707A72'
+    description = "The maximum number of internet gateways per Region. This quota is directly tied to the maximum number of VPCs per Region. To increase this quota, increase the number of VPCs per Region."
 
     @property
     def current(self):
@@ -112,10 +112,10 @@ class InternetGatewayCountCheck(QuotaCheck):
 
 class VpcEndpointCountCheck(QuotaCheck):
     key = "vpc_endpoint"
-    description = "Gateway VPC endpoints per Region"
     scope = QuotaScope.REGION
     service_code = 'vpc'
     quota_code = 'L-1B52E74A'
+    description = "The maximum number of gateway VPC endpoints per Region. The maximum is 255 gateway endpoints per VPC."
 
     @property
     def current(self):
@@ -123,10 +123,10 @@ class VpcEndpointCountCheck(QuotaCheck):
 
 class NetworkInterfaceCountCheck(QuotaCheck):
     key = "ni_count"
-    description = "VPC network interfaces per Region"
     scope = QuotaScope.REGION
     service_code = 'vpc'
     quota_code = 'L-DF5E4CA3'
+    description = "The maximum number of network interfaces per Region."
 
     @property
     def current(self):
@@ -135,10 +135,10 @@ class NetworkInterfaceCountCheck(QuotaCheck):
 
 class SecurityGroupCountCheck(QuotaCheck):
     key = "sg_count"
-    description = "VPC security groups per Region"
     scope = QuotaScope.REGION
     service_code = 'vpc'
     quota_code = 'L-E79EC296'
+    description = "The maximum number of VPC security groups per Region."
 
     @property
     def current(self):
@@ -146,10 +146,10 @@ class SecurityGroupCountCheck(QuotaCheck):
 
 class NatGatewayCountCheck(InstanceQuotaCheck):
     key = "nat_count"
-    description = "The maximum number of NAT gateways per Availability Zone"
     scope = QuotaScope.INSTANCE
     service_code = 'vpc'
     quota_code = 'L-FE5A380F'
+    description = "The maximum number of NAT gateways per Availability Zone. This includes NAT gateways in the pending, active, or deleting state."
     instance_id = 'Availability Zone Name'
 
     @staticmethod
@@ -162,9 +162,9 @@ class NatGatewayCountCheck(InstanceQuotaCheck):
 
 class RulesPerSecurityGroupCheck(InstanceQuotaCheck):
     key = "vpc_rules_per_sg"
-    description = "Rules per VPC security group"
     service_code = 'vpc'
     quota_code = 'L-0EA8095F'
+    description = "The maximum number of inbound or outbound rules per VPC security group (120 rules in total). This quota is enforced separately for IPv4 and IPv6 rules. A rule that references a security group or prefix list ID counts as one rule each for IPv4 and IPv6. This quota multiplied by the security groups per network interface quota cannot exceed 1000."
     instance_id = 'Security Group ID'
 
     @staticmethod
@@ -182,9 +182,9 @@ class RulesPerSecurityGroupCheck(InstanceQuotaCheck):
 
 class RouteTablesPerVpcCheck(InstanceQuotaCheck):
     key = "vpc_route_tables_per_vpc"
-    description = "Route Tables per VPC"
     service_code = 'vpc'
     quota_code = 'L-589F43AA'
+    description = "The maximum number of route tables per VPC. The main route table counts toward this quota."
     instance_id = 'VPC ID'
 
     @staticmethod
@@ -205,9 +205,9 @@ class RouteTablesPerVpcCheck(InstanceQuotaCheck):
 
 class RoutesPerRouteTableCheck(InstanceQuotaCheck):
     key = "vpc_routes_per_route_table"
-    description = "Routes per Route Table"
     service_code = 'vpc'
     quota_code = 'L-93826ACB'
+    description = "The maximum number of non-propagated routes per route table. This quota can be increased up to a maximum of 1000; however, network performance might be impacted. This quota is enforced separately for IPv4 and IPv6 routes."
     instance_id = 'Route Table ID'
 
     @staticmethod
@@ -225,9 +225,9 @@ class RoutesPerRouteTableCheck(InstanceQuotaCheck):
 
 class SubnetsPerVpcCheck(InstanceQuotaCheck):
     key = "vpc_subnets_per_vpc"
-    description = "Subnets per VPC"
     service_code = 'vpc'
     quota_code = 'L-407747CB'
+    description = "The maximum number of subnets per VPC."
     instance_id = 'VPC ID'
 
     @staticmethod
@@ -248,9 +248,9 @@ class SubnetsPerVpcCheck(InstanceQuotaCheck):
 
 class AclsPerVpcCheck(InstanceQuotaCheck):
     key = "vpc_acls_per_vpc"
-    description = "Network ACLs per VPC"
     service_code = 'vpc'
     quota_code = 'L-B4A6D682'
+    description = "The maximum number of network ACLs per VPC."
     instance_id = 'VPC ID'
 
     @staticmethod
@@ -271,9 +271,9 @@ class AclsPerVpcCheck(InstanceQuotaCheck):
 
 class RulesPerAclCheck(InstanceQuotaCheck):
     key = "vpc_rules_per_acl"
-    description = "Rules per Network ACL"
     service_code = 'vpc'
     quota_code = 'L-2AEEBF1A'
+    description = "The maximum number of inbound rules or outbound rules per network ACL (a total of 40 rules). This includes both IPv4 and IPv6 rules, and the default deny rules. This quota can be increased up to a maximum of 40; however, network performance might be impacted."
     instance_id = 'Network ACL ID'
 
     @staticmethod
@@ -291,9 +291,9 @@ class RulesPerAclCheck(InstanceQuotaCheck):
 
 class Ipv4CidrBlocksPerVpcCheck(InstanceQuotaCheck):
     key = "vpc_ipv4_cidr_blocks_per_vpc"
-    description = "IPv4 CIDR blocks per VPC"
     service_code = 'vpc'
     quota_code = 'L-83CA0A9D'
+    description = "The maximum number of IPv4 CIDR blocks per VPC. The primary CIDR block and all secondary CIDR blocks count toward this quota. This quota can be increased up to a maximum of 50."
     instance_id = 'VPC ID'
 
     @staticmethod
@@ -311,9 +311,9 @@ class Ipv4CidrBlocksPerVpcCheck(InstanceQuotaCheck):
 
 class Ipv6CidrBlocksPerVpcCheck(InstanceQuotaCheck):
     key = "vpc_ipv6_cidr_blocks_per_vpc"
-    description = "IPv6 CIDR blocks per VPC"
     service_code = 'vpc'
     quota_code = 'L-085A6257'
+    description = "The maximum number of IPv6 CIDR blocks per VPC."
     instance_id = 'VPC ID'
 
     @staticmethod
@@ -333,9 +333,9 @@ class Ipv6CidrBlocksPerVpcCheck(InstanceQuotaCheck):
 
 class ActiveVpcPeeringConnectionsPerVpcCheck(InstanceQuotaCheck):
     key = "vpc_peering_connections_per_vpc"
-    description = "Active VPC peering connections per VPC"
     service_code = 'vpc'
     quota_code = 'L-7E9ECCDB'
+    description = "The maximum number of active VPC peering connections per VPC. This quota can be increased up to a maximum of 125."
     instance_id = 'VPC ID'
 
     @staticmethod

@@ -3,10 +3,10 @@ from .quota_check import QuotaCheck, QuotaScope
 
 class AutoScalingGroupCountCheck(QuotaCheck):
     key = "asg_count"
-    description = "Auto Scaling groups per Region"
     scope = QuotaScope.REGION
     service_code = 'autoscaling'
     quota_code = 'L-CDE20ADC'
+    description = "The maximum number of Auto Scaling groups allowed for your AWS account"
 
     @property
     def current(self):
@@ -15,10 +15,10 @@ class AutoScalingGroupCountCheck(QuotaCheck):
 
 class LaunchConfigurationCountCheck(QuotaCheck):
     key = "lc_count"
-    description = "Launch configurations per Region"
     scope = QuotaScope.REGION
     service_code = 'autoscaling'
     quota_code = 'L-6B80B8FA'
+    description = "The maximum number of launch configurations allowed for your AWS account"
 
     @property
     def current(self):
