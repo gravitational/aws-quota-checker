@@ -29,7 +29,7 @@ def __all_subclasses(cls):
     )
 
 
-ALL_CHECKS = sorted(
+ALL_CHECKS: list[QuotaCheck] = sorted(
     [clazz for clazz in __all_subclasses(QuotaCheck) if clazz != InstanceQuotaCheck],
     key=lambda clz: clz.key,
 )

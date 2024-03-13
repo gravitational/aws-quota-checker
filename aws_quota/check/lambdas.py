@@ -3,10 +3,10 @@ from .quota_check import QuotaCheck, QuotaScope
 
 class FunctionAndLayerStorageCheck(QuotaCheck):
     key = "lambda_function_storage"
-    description = "Lambda function and layer storage"
     scope = QuotaScope.REGION
     service_code = 'lambda'
     quota_code = 'L-2ACBD22F'
+    description = "The amount of storage that's available for deployment packages and layer archives in the current Region."
 
     @property
     def current(self):

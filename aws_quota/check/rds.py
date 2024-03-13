@@ -3,10 +3,10 @@ from .quota_check import QuotaCheck, QuotaScope
 
 class RDSDBInstanceCountCheck(QuotaCheck):
     key = "rds_instances"
-    description = "RDS instances per Region"
     service_code = "rds"
     scope = QuotaScope.REGION
     quota_code = "L-7B6409FD"
+    description = "The maximum number of DB instances allowed in this account in the current Region"
 
     @property
     def current(self) -> int:
@@ -17,10 +17,10 @@ class RDSDBInstanceCountCheck(QuotaCheck):
 
 class RDSDBParameterGroupsCountCheck(QuotaCheck):
     key = "rds_parameter_groups"
-    description = "RDS parameter groups per Region"
     service_code = "rds"
     scope = QuotaScope.REGION
     quota_code = "L-DE55804A"
+    description = "The maximum number of parameter groups"
 
     @property
     def current(self) -> int:
@@ -31,10 +31,10 @@ class RDSDBParameterGroupsCountCheck(QuotaCheck):
 
 class RDSDBClusterParameterGroupCountCheck(QuotaCheck):
     key = "rds_cluster_parameter_groups"
-    description = "RDS cluster parameter groups per Region"
     service_code = "rds"
     scope = QuotaScope.REGION
     quota_code = "L-E4C808A8"
+    description = "The maximum number of DB cluster parameter groups"
 
     @property
     def current(self) -> int:
@@ -45,10 +45,10 @@ class RDSDBClusterParameterGroupCountCheck(QuotaCheck):
 
 class RDSEventSubscriptions(QuotaCheck):
     key = "rds_event_subscriptions"
-    description = "RDS event subscriptions per Region"
     service_code = "rds"
     scope = QuotaScope.REGION
     quota_code = "L-A59F4C87"
+    description = "The maximum number of event subscriptions"
 
     @property
     def current(self) -> int:
@@ -59,10 +59,10 @@ class RDSEventSubscriptions(QuotaCheck):
 
 class RDSDBSnapshotsCheck(QuotaCheck):
     key = "rds_instance_snapshots"
-    description = "Manual DB instance snapshots per Region"
     service_code = "rds"
     scope = QuotaScope.REGION
     quota_code = "L-272F1212"
+    description = "The maximum number of manual DB instance snapshots"
 
     @property
     def current(self) -> int:
@@ -73,10 +73,10 @@ class RDSDBSnapshotsCheck(QuotaCheck):
 
 class RDSDBClusterSnapshotsCheck(QuotaCheck):
     key = "rds_cluster_snapshots"
-    description = "Manual DB cluster snapshots per Region"
     service_code = "rds"
     scope = QuotaScope.REGION
     quota_code = "L-9B510759"
+    description = "The maximum number of manual DB cluster snapshots"
 
     @property
     def current(self) -> int:

@@ -4,10 +4,10 @@ from .quota_check import QuotaCheck, QuotaScope
 
 class CryptographicOperationsRequestRate(QuotaCheck):
     key = "kms_cryptographic_operations_request_rate"
-    description = "Maximum requests for cryptographic operations with a symmetric CMK per second"
     scope = QuotaScope.REGION
     service_code = "kms"
     quota_code = "L-6E3AF000"
+    description = "Maximum requests for cryptographic operations with a symmetric CMK per second. This shared quota applies to Decrypt, Encrypt, GenerateDataKey, GenerateDataKeyWithoutPlaintext, GenerateMac, GenerateRandom, ReEncrypt, and VerifyMac requests. When you reach this quota, KMS rejects this type of request for the remainder of the interval."
 
     @property
     def current(self):

@@ -16,10 +16,10 @@ def get_topic_attributes(session: boto3.Session, topic_arn) -> typing.List[str]:
 
 class TopicCountCheck(QuotaCheck):
     key = "sns_topics_count"
-    description = "SNS topics per Account"
     scope = QuotaScope.ACCOUNT
     service_code = 'sns'
     quota_code = 'L-61103206'
+    description = "The maximum number of Amazon SNS topics that an AWS account can create across all regions."
 
     @property
     def current(self):
@@ -27,10 +27,10 @@ class TopicCountCheck(QuotaCheck):
 
 class PendingSubscriptionCountCheck(QuotaCheck):
     key = "sns_pending_subscriptions_count"
-    description = "Pending SNS subscriptions per Account"
     scope = QuotaScope.ACCOUNT
     service_code = 'sns'
     quota_code = 'L-1A43D3DB'
+    description = "The maximum number of pending subscriptions per AWS account, across all regions."
 
     @property
     def current(self):
@@ -45,9 +45,9 @@ class PendingSubscriptionCountCheck(QuotaCheck):
 
 class SubscriptionsPerTopicCheck(InstanceQuotaCheck):
     key = "sns_subscriptions_per_topic"
-    description = "SNS subscriptions per topics"
     service_code = 'sns'
     quota_code = 'L-A4340BCD'
+    description = "The maximum number of subscriptions per topic, including confirmed and pending subscriptions."
     instance_id = 'Topic ARN'
 
     @staticmethod
