@@ -8,6 +8,7 @@ class HostedZoneCountCheck(QuotaCheck):
     key = "route53_hosted_zone_count"
     description = "Route53 Hosted Zones per Account"
     scope = QuotaScope.ACCOUNT
+    service_code = "route53"
 
     @property
     def maximum(self):
@@ -22,6 +23,7 @@ class HealthCheckCountCheck(QuotaCheck):
     key = "route53_health_check_count"
     description = "Route53 Health Checks per Account"
     scope = QuotaScope.ACCOUNT
+    service_code = "route53"
 
     @property
     def maximum(self):
@@ -36,6 +38,7 @@ class ReusableDelegationSetCountCheck(QuotaCheck):
     key = "route53_reusable_delegation_set_count"
     description = "Route53 Reusable Delegation Sets per Account"
     scope = QuotaScope.ACCOUNT
+    service_code = "route53"
 
     @property
     def maximum(self):
@@ -50,6 +53,7 @@ class TrafficPolicyCountCheck(QuotaCheck):
     key = "route53_traffic_policy_count"
     description = "Route53 Traffic Policies per Account"
     scope = QuotaScope.ACCOUNT
+    service_code = "route53"
 
     @property
     def maximum(self):
@@ -64,6 +68,7 @@ class TrafficPolicyInstanceCountCheck(QuotaCheck):
     key = "route53_traffic_policy_instance_count"
     description = "Route53 Traffic Policy Instances per Account"
     scope = QuotaScope.ACCOUNT
+    service_code = "route53"
 
     @property
     def maximum(self):
@@ -78,6 +83,7 @@ class RecordsPerHostedZoneCheck(InstanceQuotaCheck):
     key = "route53_records_per_hosted_zone"
     description = "Records per Route53 Hosted Zone"
     instance_id = 'Hosted Zone ID'
+    service_code = "route53"
 
     @staticmethod
     def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
@@ -102,6 +108,7 @@ class AssociatedVpcHostedZoneCheck(InstanceQuotaCheck):
     key = "route53_vpcs_per_hosted_zone"
     description = "Associated VPCs per Route53 Hosted Zone"
     instance_id = 'Hosted Zone ID'
+    service_code = "route53"
 
     @staticmethod
     def get_all_identifiers(session: boto3.Session) -> typing.List[str]:

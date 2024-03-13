@@ -13,6 +13,7 @@ class GroupCountCheck(QuotaCheck):
     key = "iam_group_count"
     description = "IAM groups per Account"
     scope = QuotaScope.ACCOUNT
+    service_code = "iam"
 
     @property
     def maximum(self):
@@ -27,6 +28,7 @@ class UsersCountCheck(QuotaCheck):
     key = "iam_user_count"
     description = "IAM users per Account"
     scope = QuotaScope.ACCOUNT
+    service_code = "iam"
 
     @property
     def maximum(self):
@@ -41,6 +43,7 @@ class PolicyCountCheck(QuotaCheck):
     key = "iam_policy_count"
     description = "IAM policies per Account"
     scope = QuotaScope.ACCOUNT
+    service_code = "iam"
 
     @property
     def maximum(self):
@@ -55,6 +58,7 @@ class PolicyVersionCountCheck(QuotaCheck):
     key = "iam_policy_version_count"
     description = "IAM policy versions in use per Account"
     scope = QuotaScope.ACCOUNT
+    service_code = "iam"
 
     @property
     def maximum(self):
@@ -69,6 +73,7 @@ class ServerCertificateCountCheck(QuotaCheck):
     key = "iam_server_certificate_count"
     description = "IAM server certificates per Account"
     scope = QuotaScope.ACCOUNT
+    service_code = "iam"
 
     @property
     def maximum(self):
@@ -83,6 +88,7 @@ class AttachedPolicyPerUserCheck(InstanceQuotaCheck):
     key = "iam_attached_policy_per_user"
     description = "Attached IAM policies per user"
     instance_id = "User Name"
+    service_code = "iam"
 
     @staticmethod
     def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
@@ -103,6 +109,7 @@ class AttachedPolicyPerGroupCheck(InstanceQuotaCheck):
     key = "iam_attached_policy_per_group"
     description = "Attached IAM policies per group"
     instance_id = "Group Name"
+    service_code = "iam"
 
     @staticmethod
     def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
@@ -123,6 +130,7 @@ class AttachedPolicyPerRoleCheck(InstanceQuotaCheck):
     key = "iam_attached_policy_per_role"
     description = "Attached IAM policies per role"
     instance_id = "Role Name"
+    service_code = "iam"
 
     @staticmethod
     def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
