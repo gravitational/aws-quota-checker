@@ -44,6 +44,7 @@ for s in set(services):
     try:
         service = None
         quota = None
+        # inject description into check class
         with fileinput.FileInput(filename, inplace=True) as file:
             for line in file:
                 if r_desc.match(line):
@@ -64,7 +65,6 @@ for s in set(services):
                     service = None
                     quota = None
 
-        
         print("Updated {} description in {}".format(chk.quota_code, filename))
     except Exception as e:
         print(

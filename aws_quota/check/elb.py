@@ -23,10 +23,10 @@ def get_classic_elbs(session: boto3.Session):
 
 class ClassicLoadBalancerCountCheck(QuotaCheck):
     key = "elb_clb_count"
-    description = "Classic Load Balancers per Region"
     scope = QuotaScope.REGION
     service_code = 'elasticloadbalancing'
     quota_code = 'L-E9E9831D'
+    description = "The maximum number of Classic Load Balancers per Region"
 
     @property
     def current(self):
@@ -35,9 +35,9 @@ class ClassicLoadBalancerCountCheck(QuotaCheck):
 
 class ListenerPerClassicLoadBalancerCountCheck(InstanceQuotaCheck):
     key = "elb_listeners_per_clb"
-    description = "Listeners per Classic Load Balancer"
     service_code = 'elasticloadbalancing'
     quota_code = 'L-1A491844'
+    description = "The maximum number of listeners per Classic Load Balancer"
     instance_id = 'Load Balancer Name'
 
     @staticmethod
@@ -58,10 +58,10 @@ class ListenerPerClassicLoadBalancerCountCheck(InstanceQuotaCheck):
 
 class NetworkLoadBalancerCountCheck(QuotaCheck):
     key = "elb_nlb_count"
-    description = "Network Load Balancers per Region"
     scope = QuotaScope.REGION
     service_code = 'elasticloadbalancing'
     quota_code = 'L-69A177A2'
+    description = "The maximum number of Network Load Balancers per Region"
 
     @property
     def current(self):
@@ -70,9 +70,9 @@ class NetworkLoadBalancerCountCheck(QuotaCheck):
 
 class ListenerPerNetworkLoadBalancerCountCheck(InstanceQuotaCheck):
     key = "elb_listeners_per_nlb"
-    description = "Listeners per Network Load Balancer"
     service_code = 'elasticloadbalancing'
     quota_code = 'L-57A373D6'
+    description = "The maximum number of listeners per Network Load Balancer"
     instance_id = 'Load Balancer ARN'
 
     @staticmethod
@@ -89,10 +89,10 @@ class ListenerPerNetworkLoadBalancerCountCheck(InstanceQuotaCheck):
 
 class ApplicationLoadBalancerCountCheck(QuotaCheck):
     key = "elb_alb_count"
-    description = "Application Load Balancers per Region"
     scope = QuotaScope.REGION
     service_code = 'elasticloadbalancing'
     quota_code = 'L-53DA6B97'
+    description = "The maximum number of Application Load Balancers per Region"
 
     @property
     def current(self):
@@ -101,9 +101,9 @@ class ApplicationLoadBalancerCountCheck(QuotaCheck):
 
 class ListenerPerApplicationLoadBalancerCountCheck(InstanceQuotaCheck):
     key = "elb_listeners_per_alb"
-    description = "Listeners per Application Load Balancer"
     service_code = 'elasticloadbalancing'
     quota_code = 'L-B6DF7632'
+    description = "The maximum number of listeners per Application Load Balancer"
     instance_id = 'Load Balancer ARN'
 
     @staticmethod
@@ -120,10 +120,10 @@ class ListenerPerApplicationLoadBalancerCountCheck(InstanceQuotaCheck):
 
 class TargetGroupCountCheck(QuotaCheck):
     key = "elb_target_group_count"
-    description = "Target Groups per Region"
     scope = QuotaScope.REGION
     service_code = 'elasticloadbalancing'
     quota_code = 'L-B22855CB'
+    description = "The maximum number of target groups per Region"
 
     @property
     def current(self):
@@ -132,9 +132,9 @@ class TargetGroupCountCheck(QuotaCheck):
 
 class TargetGroupsPerApplicationLoadBalancerCountCheck(InstanceQuotaCheck):
     key = "elb_target_groups_per_alb"
-    description = "Target groups per Application Load Balancer"
     service_code = 'elasticloadbalancing'
     quota_code = 'L-822D1B1B'
+    description = "The maximum number of target groups per Application Load Balancer"
     instance_id = 'Load Balancer ARN'
 
     @staticmethod

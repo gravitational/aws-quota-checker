@@ -17,10 +17,10 @@ def get_node_groups(session: boto3.Session, cluster_name) -> typing.List[str]:
 
 class ClusterCountCheck(QuotaCheck):
     key = "eks_count"
-    description = "EKS Clusters per Region"
     scope = QuotaScope.REGION
     service_code = 'eks'
     quota_code = 'L-1194D53C'
+    description = "The maximum number of EKS clusters in this account in the current Region."
 
     @property
     def current(self):
@@ -29,9 +29,9 @@ class ClusterCountCheck(QuotaCheck):
 
 class NodeGroupsPerCluster(InstanceQuotaCheck):
     key = "eks_node_groups_per_cluster_count"
-    description = "The maximum number of managed node groups per cluster."
     service_code = 'eks'
     quota_code = 'L-6D54EA21'
+    description = "The maximum number of managed node groups per cluster."
     instance_id = 'Cluster ID'
 
     @staticmethod
@@ -45,9 +45,9 @@ class NodeGroupsPerCluster(InstanceQuotaCheck):
 
 class NodesPerNodeGroup(InstanceQuotaCheck):
     key = "eks_nodes_per_node_group_count"
-    description = "The maximum number of nodes per managed node group"
     service_code = 'eks'
     quota_code = 'L-BD136A63'
+    description = "The maximum number of nodes per managed node group."
     instance_id = {'eks_cluster': None, 'eks_nodegroup': None }
 
     @staticmethod

@@ -40,10 +40,10 @@ def get_all_spot_requests(session: boto3.Session):
 
 class OnDemandStandardInstanceCountCheck(QuotaCheck):
     key = "ec2_on_demand_standard_count"
-    description = "Running On-Demand Standard (A, C, D, H, I, M, R, T, Z) EC2 instances"
     scope = QuotaScope.ACCOUNT
     service_code = "ec2"
     quota_code = "L-1216C47A"
+    description = "Maximum number of vCPUs assigned to the Running On-Demand Standard (A, C, D, H, I, M, R, T, Z) instances."
 
     @property
     def current(self):
@@ -53,10 +53,10 @@ class OnDemandStandardInstanceCountCheck(QuotaCheck):
 
 class OnDemandFInstanceCountCheck(QuotaCheck):
     key = "ec2_on_demand_f_count"
-    description = "Running On-Demand F EC2 instances"
     scope = QuotaScope.ACCOUNT
     service_code = "ec2"
     quota_code = "L-74FC7D96"
+    description = "Maximum number of vCPUs assigned to the Running On-Demand F instances."
 
     @property
     def current(self):
@@ -66,10 +66,10 @@ class OnDemandFInstanceCountCheck(QuotaCheck):
 
 class OnDemandGInstanceCountCheck(QuotaCheck):
     key = "ec2_on_demand_g_count"
-    description = "Running On-Demand G EC2 instances"
     scope = QuotaScope.ACCOUNT
     service_code = "ec2"
     quota_code = "L-DB2E81BA"
+    description = "Maximum number of vCPUs assigned to the Running On-Demand G and VT instances."
 
     @property
     def current(self):
@@ -79,10 +79,10 @@ class OnDemandGInstanceCountCheck(QuotaCheck):
 
 class OnDemandInfInstanceCountCheck(QuotaCheck):
     key = "ec2_on_demand_inf_count"
-    description = "Running On-Demand Inf EC2 instances"
     scope = QuotaScope.ACCOUNT
     service_code = "ec2"
     quota_code = "L-1945791B"
+    description = "Maximum number of vCPUs assigned to the Running On-Demand Inf instances."
 
     @property
     def current(self):
@@ -92,10 +92,10 @@ class OnDemandInfInstanceCountCheck(QuotaCheck):
 
 class OnDemandPInstanceCountCheck(QuotaCheck):
     key = "ec2_on_demand_p_count"
-    description = "Running On-Demand P EC2 instances"
     scope = QuotaScope.ACCOUNT
     service_code = "ec2"
     quota_code = "L-417A185B"
+    description = "Maximum number of vCPUs assigned to the Running On-Demand P instances."
 
     @property
     def current(self):
@@ -105,10 +105,10 @@ class OnDemandPInstanceCountCheck(QuotaCheck):
 
 class OnDemandXInstanceCountCheck(QuotaCheck):
     key = "ec2_on_demand_x_count"
-    description = "Running On-Demand X EC2 instances"
     scope = QuotaScope.ACCOUNT
     service_code = "ec2"
     quota_code = "L-7295265B"
+    description = "Maximum number of vCPUs assigned to the Running On-Demand X instances."
 
     @property
     def current(self):
@@ -118,10 +118,10 @@ class OnDemandXInstanceCountCheck(QuotaCheck):
 
 class SpotStandardRequestCountCheck(QuotaCheck):
     key = "ec2_spot_standard_count"
-    description = "All Standard (A, C, D, H, I, M, R, T, Z) EC2 Spot Instance Requests"
     scope = QuotaScope.ACCOUNT
     service_code = "ec2"
     quota_code = "L-34B43A08"
+    description = "The maximum number of vCPUs for all running or requested Standard (A, C, D, H, I, M, R, T, Z) Spot Instances per Region"
 
     @property
     def current(self):
@@ -131,10 +131,10 @@ class SpotStandardRequestCountCheck(QuotaCheck):
 
 class SpotFRequestCountCheck(QuotaCheck):
     key = "ec2_spot_f_count"
-    description = "All F EC2 Spot Instance Requests"
     scope = QuotaScope.ACCOUNT
     service_code = "ec2"
     quota_code = "L-88CF9481"
+    description = "The maximum number of vCPUs for all running or requested F Spot Instances per Region"
 
     @property
     def current(self):
@@ -144,10 +144,10 @@ class SpotFRequestCountCheck(QuotaCheck):
 
 class SpotGRequestCountCheck(QuotaCheck):
     key = "ec2_spot_g_count"
-    description = "All G EC2 Spot Instance Requests"
     scope = QuotaScope.ACCOUNT
     service_code = "ec2"
     quota_code = "L-3819A6DF"
+    description = "The maximum number of vCPUs for all running or requested G and VT Spot Instances per Region"
 
     @property
     def current(self):
@@ -157,10 +157,10 @@ class SpotGRequestCountCheck(QuotaCheck):
 
 class SpotInfRequestCountCheck(QuotaCheck):
     key = "ec2_spot_inf_count"
-    description = "All Inf EC2 Spot Instance Requests"
     scope = QuotaScope.ACCOUNT
     service_code = "ec2"
     quota_code = "L-B5D1601B"
+    description = "The maximum number of vCPUs for all running or requested Inf Spot Instances per Region"
 
     @property
     def current(self):
@@ -170,10 +170,10 @@ class SpotInfRequestCountCheck(QuotaCheck):
 
 class SpotPRequestCountCheck(QuotaCheck):
     key = "ec2_spot_p_count"
-    description = "All P EC2 Spot Instance Requests"
     scope = QuotaScope.ACCOUNT
     service_code = "ec2"
     quota_code = "L-7212CCBC"
+    description = "The maximum number of vCPUs for all running or requested P4, P3 or P2 Spot Instances per Region"
 
     @property
     def current(self):
@@ -183,10 +183,10 @@ class SpotPRequestCountCheck(QuotaCheck):
 
 class SpotXRequestCountCheck(QuotaCheck):
     key = "ec2_spot_x_count"
-    description = "All X EC2 Spot Instance Requests"
     scope = QuotaScope.ACCOUNT
     service_code = "ec2"
     quota_code = "L-E3A00192"
+    description = "The maximum number of vCPUs for all running or requested X Spot Instances per Region"
 
     @property
     def current(self):
@@ -196,10 +196,10 @@ class SpotXRequestCountCheck(QuotaCheck):
 
 class ElasticIpCountCheck(QuotaCheck):
     key = "ec2_eip_count"
-    description = "EC2 VPC Elastic IPs"
     scope = QuotaScope.ACCOUNT
     service_code = 'ec2'
     quota_code = 'L-0263D0A3'
+    description = "The maximum number of Elastic IP addresses that you can allocate for EC2-VPC in this Region."
 
     @property
     def current(self):
@@ -208,10 +208,10 @@ class ElasticIpCountCheck(QuotaCheck):
 
 class TransitGatewayCountCheck(QuotaCheck):
     key = "ec2_tgw_count"
-    description = "Transit Gateways per Account"
     scope = QuotaScope.ACCOUNT
     service_code = 'ec2'
     quota_code = 'L-A2478D36'
+    description = "Number of transit gateways per Region per account."
 
     @property
     def current(self):
@@ -220,10 +220,10 @@ class TransitGatewayCountCheck(QuotaCheck):
 
 class VpnConnectionCountCheck(QuotaCheck):
     key = "ec2_vpn_connection_count"
-    description = "VPN connections per Region"
     scope = QuotaScope.REGION
     service_code = 'ec2'
     quota_code = 'L-3E6EC3A3'
+    description = "The maximum number of Site-to-Site VPN connections that you can create per region."
 
     @property
     def current(self):
@@ -231,10 +231,10 @@ class VpnConnectionCountCheck(QuotaCheck):
 
 class LaunchTemplatesCount(QuotaCheck):
     key = "launch_templates_count"
-    description = "Maximum number of launch templates per Region per account."
     scope = QuotaScope.REGION
     service_code = 'ec2'
     quota_code = 'L-FB451C26'
+    description = "Maximum number of launch templates per Region per account."
 
     @property
     def current(self):
