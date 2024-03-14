@@ -1,5 +1,5 @@
 import cachetools
-from aws_quota.exceptions import InstanceWithIdentifierNotFound
+from aws_quota.exceptions import InstanceWithIdentifierNotFound, NotImplementedInFavourOfCloudWatch
 from aws_quota.utils import get_paginated_results
 import typing
 import boto3
@@ -62,3 +62,18 @@ class SubscriptionsPerTopicCheck(InstanceQuotaCheck):
             raise InstanceWithIdentifierNotFound(self) from e
 
         return int(topic_attrs['SubscriptionsConfirmed']) + int(topic_attrs['SubscriptionsPending'])
+
+
+class MessagesPublishedPerSecondCheck(QuotaCheck):
+    key = "sns_messages_published_per_second"
+    scope = QuotaScope.REGION
+    service_code = 'sns'
+    quota_code = 'L-F8E2BA85'
+    description = "The maximum number of messages published per second. Utilization value displays per minute usage."
+
+    @property
+    def current(self):
+        ## Current usage can be found in CloudWatch under:
+        ## ["AWS/Usage", "ResourceCount", "Class", "None", "Resource", "NumberOfMessagesPublishedPerAccount", "Service", "SNS", "Type", "Resource"]
+        raise NotImplementedInFavourOfCloudWatch(self)
+
