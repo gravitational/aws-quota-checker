@@ -1,4 +1,5 @@
 import logging
+from textwrap import shorten
 from aws_quota.utils import get_account_id
 import enum
 import typing
@@ -57,7 +58,7 @@ class Runner:
         self.error_threshold = error_threshold
         self.fail_on_warning = fail_on_error
 
-    def __report(self, description, scope, current, maximum) -> ReportResult:
+    def __report(self, key, description, scope, current, maximum) -> ReportResult:
         if current is None or maximum is None:
             percentage = None
         elif maximum != 0:
@@ -83,7 +84,7 @@ class Runner:
             result = Runner.ReportResult.ERROR
 
         click.echo(
-            f'{description} [{scope}]: {current if current is not None else "?"}/{maximum if maximum is not None else "?"} ', nl=False)
+            f'{key} ({description}) [{scope}]: {current if current is not None else "?"}/{maximum if maximum is not None else "?"} ', nl=False)
 
         click.echo(click.style(symbol, fg=color, bold=True))
 
@@ -114,7 +115,7 @@ class Runner:
             elif chk.scope == QuotaScope.INSTANCE:
                 scope = f'{get_account_id(self.session)}/{self.session.region_name}/{chk.instance_id}'
 
-            result = self.__report(chk.description, scope, current, maximum)
+            result = self.__report(chk.key, shorten(text=chk.description, width=75), scope, current, maximum)
 
             if result == Runner.ReportResult.WARNING:
                 warnings += 1
