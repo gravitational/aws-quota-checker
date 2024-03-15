@@ -1,3 +1,5 @@
+import cachetools
+from cachetools.keys import hashkey
 from aws_quota.utils import get_account_id, get_paginated_results
 import enum
 import typing
@@ -5,6 +7,21 @@ import typing
 import boto3
 from botocore.config import Config
 
+# create custom hash key that ignores boto client
+def get_service_quota_cache_key(sq_client, service_code, quota_code):
+    return hashkey(service_code, quota_code)
+
+# create custom hash key that ignores boto client
+def get_default_service_quota_cache_key(sq_client, service_code, quota_code):
+    return hashkey("default", service_code, quota_code)
+
+@cachetools.cached(cache=cachetools.TTLCache(1000, 3600), key=get_service_quota_cache_key)
+def get_service_quota(sq_client: boto3.client, service_code, quota_code):
+    return sq_client.get_service_quota(ServiceCode=service_code, QuotaCode=quota_code)['Quota']
+
+@cachetools.cached(cache=cachetools.TTLCache(1000, 3600), key=get_default_service_quota_cache_key)
+def get_default_service_quota(sq_client: boto3.client, service_code, quota_code):
+    return sq_client.get_aws_default_service_quota(ServiceCode=service_code, QuotaCode=quota_code)['Quota']
 
 class QuotaScope(enum.Enum):
     ACCOUNT = 0
@@ -19,7 +36,7 @@ class QuotaCheck:
     quota_code: str = None
     warning_threshold: float = None
     error_threshold: float = None
-    # retries are needed to handle rate limitting
+    # retries are needed to handle rate limiting
     # https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html
     retry_attempts: int = 15
 
@@ -64,9 +81,9 @@ class QuotaCheck:
     @property
     def maximum(self) -> int:
         try:
-            return int(self.sq_client.get_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
+            return int(get_service_quota(self.sq_client, self.service_code, self.quota_code)['Value'])
         except self.sq_client.exceptions.NoSuchResourceException:
-            return int(self.sq_client.get_aws_default_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
+            return int(get_default_service_quota(self.sq_client, self.service_code, self.quota_code)['Value'])
 
     @property
     def current(self) -> int:
