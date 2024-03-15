@@ -1,5 +1,5 @@
 import cachetools
-from aws_quota.exceptions import InstanceWithIdentifierNotFound
+from aws_quota.exceptions import InstanceWithIdentifierNotFound, NotImplementedInFavourOfCloudWatch
 from aws_quota.utils import get_paginated_results
 import typing
 import boto3
@@ -62,3 +62,45 @@ class SubscriptionsPerTopicCheck(InstanceQuotaCheck):
             raise InstanceWithIdentifierNotFound(self) from e
 
         return int(topic_attrs['SubscriptionsConfirmed']) + int(topic_attrs['SubscriptionsPending'])
+
+
+class MessagesPublishedPerSecondCheck(QuotaCheck):
+    key = "sns_messages_published_per_second"
+    scope = QuotaScope.REGION
+    service_code = 'sns'
+    quota_code = 'L-F8E2BA85'
+    description = "The maximum number of messages published per second. Utilization value displays per minute usage."
+
+    @property
+    def current(self):
+        ## Current usage can be found in CloudWatch under:
+        ## ["AWS/Usage", "ResourceCount", "Class", "None", "Resource", "NumberOfMessagesPublishedPerAccount", "Service", "SNS", "Type", "Resource"]
+        raise NotImplementedInFavourOfCloudWatch(self)
+
+
+class ListTopicTransactionsPerSecondCheck(QuotaCheck):
+    key = "sns_list_topic_transactions_topic_per_second"
+    scope = QuotaScope.REGION
+    service_code = 'sns'
+    quota_code = 'L-039289D5'
+    description = "The maximum number of times the ListTopics action can be called per second."
+
+    @property
+    def current(self):
+        ## Current usage can be found in CloudWatch under:
+        ## ["AWS/Usage", "CallCount", "Class", "None", "Resource", "ListTopics", "Service", "SNS", "Type", "API"]
+        raise NotImplementedInFavourOfCloudWatch(self)
+
+
+class ListTagsForResourceTransactionsPerSecondCheck(QuotaCheck):
+    key = "sns_list_tags_for_resource_transactions_per_second"
+    scope = QuotaScope.REGION
+    service_code = 'sns'
+    quota_code = 'L-93CEC191'
+    description = "The maximum number of times the ListTagsForResource action can be called per second."
+
+    @property
+    def current(self):
+        ## Current usage can be found in CloudWatch under:
+        ## ["AWS/Usage", "CallCount", "Class", "None", "Resource", "ListTagsForResource", "Service", "SNS", "Type", "API"]
+        raise NotImplementedInFavourOfCloudWatch(self)
