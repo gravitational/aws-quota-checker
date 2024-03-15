@@ -4,9 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-aws-quota-checker = {editable = true, extras = ["dev"], path = "."}
+aws-quota-checker = {editable = true, extras = ["dev", "prometheus"], path = "."}
 
 [dev-packages]
 
 [requires]
-python_version = "3"
+python_version = "3.11"
