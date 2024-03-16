@@ -4,6 +4,7 @@ from .autoscaling import *
 from .cloudformation import *
 from .dynamodb import *
 from .ebs import *
+from .ecr import *
 from .ec2 import *
 from .ecs import *
 from .eks import *
