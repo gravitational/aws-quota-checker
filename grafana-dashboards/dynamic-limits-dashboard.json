@@ -1,0 +1,399 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "links": [
+      {
+        "asDropdown": false,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [],
+        "targetBlank": true,
+        "title": "Service Quotas",
+        "tooltip": "",
+        "type": "link",
+        "url": "https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html"
+      },
+      {
+        "asDropdown": false,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [],
+        "targetBlank": true,
+        "title": "aws-quota-checker",
+        "tooltip": "",
+        "type": "link",
+        "url": "https://github.com/gravitational/aws-quota-checker"
+      }
+    ],
+    "liveNow": false,
+    "panels": [
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "id": 1,
+        "panels": [],
+        "targets": [
+        ],
+        "title": "AWS Quota Checker limits utilization ($MinQuotaThreashold% and higher)",
+        "type": "row"
+      },
+      {
+        "description": "Dynamic list of all account level service quotas fetched by [aws-quota-checker](https://github.com/gravitational/aws-quota-checker)\n- https://docs.aws.amazon.com/general/latest/gr/aws-service-information.html\n",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "displayName": "[account] ${__field.labels.service_code} |  ${__field.labels.quota}",
+            "fieldMinMax": false,
+            "mappings": [],
+            "max": 1,
+            "min": 0,
+            "thresholds": {
+              "mode": "percentage",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "yellow",
+                  "value": 60
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "percentunit",
+            "unitScale": true
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 15,
+          "w": 12,
+          "x": 0,
+          "y": 1
+        },
+        "id": 2,
+        "options": {
+          "displayMode": "lcd",
+          "maxVizHeight": 100,
+          "minVizHeight": 20,
+          "minVizWidth": 8,
+          "namePlacement": "auto",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showUnfilled": true,
+          "sizing": "manual",
+          "valueMode": "color"
+        },
+        "pluginVersion": "10.3.3",
+        "targets": [
+          {
+            "disableTextWrap": false,
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "sort_desc((max by(quota, account, service_code) ({__name__=~\"awsquota_.*_count\", exported_instance=\"\", scope=\"ACCOUNT\"}) / max by(quota, account, service_code) ({__name__=~\"awsquota_.*_count_limit\", exported_instance=\"\", scope=\"ACCOUNT\"})) >= $MinQuotaThreashold/100)",
+            "format": "time_series",
+            "fullMetaSearch": false,
+            "hide": false,
+            "includeNullMetadata": true,
+            "instant": true,
+            "interval": "",
+            "legendFormat": "__auto",
+            "range": false,
+            "refId": "A",
+            "useBackend": false
+          }
+        ],
+        "title": "Account level AWS Quota Checker ($MinQuotaThreashold% and higher)",
+        "transformations": [],
+        "transparent": true,
+        "type": "bargauge"
+      },
+      {
+        "description": "Dynamic list of all regional service quotas fetched by [aws-quota-checker](https://github.com/gravitational/aws-quota-checker)\n- nhttps://docs.aws.amazon.com/general/latest/gr/aws-service-information.html\n",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "displayName": "[${__field.labels.region}] ${__field.labels.service_code} | ${__field.labels.quota}",
+            "fieldMinMax": false,
+            "mappings": [],
+            "max": 1,
+            "min": 0,
+            "thresholds": {
+              "mode": "percentage",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 60
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "percentunit",
+            "unitScale": true
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 15,
+          "w": 12,
+          "x": 12,
+          "y": 1
+        },
+        "id": 3,
+        "options": {
+          "displayMode": "lcd",
+          "maxVizHeight": 100,
+          "minVizHeight": 20,
+          "minVizWidth": 8,
+          "namePlacement": "auto",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showUnfilled": true,
+          "sizing": "manual",
+          "valueMode": "color"
+        },
+        "pluginVersion": "10.3.3",
+        "targets": [
+          {
+            "disableTextWrap": false,
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "sort_desc((max by(quota, region, service_code) ({__name__=~\"awsquota_.*_count\", region=~\"$region\", exported_instance=\"\", scope=\"REGION\"}) / max by(quota, region, service_code) ({__name__=~\"awsquota_.*_count_limit\", region=~\"$region\", exported_instance=\"\", scope=\"REGION\"})) >= $MinQuotaThreashold/100)",
+            "format": "time_series",
+            "fullMetaSearch": false,
+            "hide": false,
+            "includeNullMetadata": true,
+            "instant": true,
+            "interval": "",
+            "legendFormat": "__auto",
+            "range": false,
+            "refId": "A",
+            "useBackend": false
+          }
+        ],
+        "title": "[${region}] Regional AWS Quota Checker limits ($MinQuotaThreashold% and higher)",
+        "transformations": [],
+        "transparent": true,
+        "type": "bargauge"
+      },
+      {
+        "description": "Dynamic list of all resource based service quotas fetched by [aws-quota-checker](https://github.com/gravitational/aws-quota-checker)\n- https://docs.aws.amazon.com/general/latest/gr/aws-service-information.html\n",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "displayName": "[${__field.labels.exported_instance}] ${__field.labels.service_code} | ${__field.labels.quota}",
+            "fieldMinMax": false,
+            "mappings": [],
+            "max": 1,
+            "min": 0,
+            "thresholds": {
+              "mode": "percentage",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 60
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "percentunit",
+            "unitScale": true
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 19,
+          "w": 24,
+          "x": 0,
+          "y": 16
+        },
+        "id": 4,
+        "options": {
+          "displayMode": "lcd",
+          "maxVizHeight": 100,
+          "minVizHeight": 20,
+          "minVizWidth": 8,
+          "namePlacement": "auto",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showUnfilled": true,
+          "sizing": "manual",
+          "valueMode": "color"
+        },
+        "pluginVersion": "10.3.3",
+        "targets": [
+          {
+            "disableTextWrap": false,
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "sort_desc(max by(quota, exported_instance, service_code) ({__name__=~\"awsquota_.*[^_limit]$\", scope=\"INSTANCE\", region=~\"$region\"}) / max by(quota, exported_instance, service_code) ({__name__=~\"awsquota_.*_limit$\", scope=\"INSTANCE\", region=~\"$region\"}) >= $MinQuotaThreashold/100)",
+            "format": "time_series",
+            "fullMetaSearch": false,
+            "hide": false,
+            "includeNullMetadata": true,
+            "instant": true,
+            "interval": "",
+            "legendFormat": "__auto",
+            "range": false,
+            "refId": "A",
+            "useBackend": false
+          }
+        ],
+        "title": "Per resource limits ($MinQuotaThreashold% and higher)",
+        "transformations": [],
+        "transparent": true,
+        "type": "bargauge"
+      }
+    ],
+    "refresh": "",
+    "schemaVersion": 39,
+    "tags": [
+      "AWS"
+    ],
+    "templating": {
+      "list": [
+        {
+          "allValue": "0",
+          "current": {
+            "selected": true,
+            "text": "30",
+            "value": "30"
+          },
+          "description": "This option allows you to hide quotas under certain threshold to make dynamic dashboards less cluttered",
+          "hide": 0,
+          "includeAll": true,
+          "label": "Only show quotas with % and higher",
+          "multi": false,
+          "name": "MinQuotaThreashold",
+          "options": [
+            {
+              "selected": false,
+              "text": "All",
+              "value": "$__all"
+            },
+            {
+              "selected": true,
+              "text": "30",
+              "value": "30"
+            },
+            {
+              "selected": false,
+              "text": "40",
+              "value": "40"
+            },
+            {
+              "selected": false,
+              "text": "50",
+              "value": "50"
+            }
+          ],
+          "query": "30, 40, 50",
+          "queryValue": "",
+          "skipUrlSync": false,
+          "type": "custom"
+        },
+        {
+          "current": {
+            "selected": true,
+            "text": [
+              "All"
+            ],
+            "value": [
+              "$__all"
+            ]
+          },
+          "definition": "label_values(awsquota_check_count,region)",
+          "hide": 0,
+          "includeAll": true,
+          "label": "region",
+          "multi": true,
+          "name": "region",
+          "options": [],
+          "query": {
+            "qryType": 1,
+            "query": "label_values(awsquota_check_count,region)",
+            "refId": "PrometheusVariableQueryEditor-VariableQuery"
+          },
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "type": "query"
+        }
+      ]
+    },
+    "time": {
+      "from": "now-2h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "AWS Quota Checker",
+    "weekStart": ""
+  }
