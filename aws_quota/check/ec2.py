@@ -239,3 +239,29 @@ class LaunchTemplatesCount(QuotaCheck):
     @property
     def current(self):
         return self.count_paginated_results("ec2", "describe_launch_templates", "LaunchTemplates")
+
+class AmiCount(QuotaCheck):
+    key = "ec2_ami_count"
+    scope = QuotaScope.REGION
+    service_code = 'ec2'
+    quota_code = 'L-B665C33B'
+    description = "The maximum number of public and private AMIs allowed in this Region. These include available, disabled, and pending AMIs, and AMIs in the Recycle Bin."
+
+    @property
+    def current(self):
+        return self.count_paginated_results("ec2", "describe_images", "Images", 
+                                            {"Owners": ["self"], "IncludeDeprecated": True, "IncludeDisabled": True}) + \
+            self.count_paginated_results("ec2", "list_images_in_recycle_bin", "Images")
+
+class PublicAmiCount(QuotaCheck):
+    key = "ec2_public_ami_count"
+    scope = QuotaScope.REGION
+    service_code = 'ec2'
+    quota_code = 'L-0E3CBAB9'
+    description = "The maximum number of public AMIs, including public AMIs in the Recycle Bin, allowed in this Region."
+
+    @property
+    def current(self):
+        return self.count_paginated_results("ec2", "describe_images", "Images", 
+                                            {"Owners": ["self"], "IncludeDeprecated": True, "IncludeDisabled": True, 
+                                             "Filters":[{"Name": "is-public", "Values": ["true"]}]})
