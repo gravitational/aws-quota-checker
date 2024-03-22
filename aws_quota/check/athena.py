@@ -3,7 +3,7 @@ from .quota_check import QuotaCheck, QuotaScope
 
 
 class AthenaActiveDDLQueries(QuotaCheck):
-    key = "athena_actvice_ddl_queries_count"
+    key = "athena_active_ddl_queries_count"
     scope = QuotaScope.REGION
     service_code = 'athena'
     quota_code = 'L-3CE0BBA0'
@@ -16,7 +16,7 @@ class AthenaActiveDDLQueries(QuotaCheck):
         raise NotImplementedInFavourOfCloudWatch(self)
 
 class AthenaActiveDMLQueries(QuotaCheck):
-    key = "athena_actvice_dml_queries_count"
+    key = "athena_active_dml_queries_count"
     scope = QuotaScope.REGION
     service_code = 'athena'
     quota_code = 'L-FC5F6546'
