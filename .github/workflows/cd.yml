@@ -2,7 +2,9 @@ name: cd
 on:
   push:
     branches:
-    - teleport
+      - teleport
+    tags:
+      - v*
   workflow_dispatch:
 
 permissions:
@@ -70,6 +72,9 @@ jobs:
             latest=false
           tags: |
             type=sha,prefix={{branch}}-,suffix=-{{date 'YYYYMMDDTHHmmss'}},format=short,enable=true
+            type=semver,pattern={{major}},enable=${{ github.event_name == 'event_name' && startsWith(github.ref, 'refs/tags/v') }}
+            type=semver,pattern={{major}}.{{minor}},enable=${{ github.event_name == 'event_name' && startsWith(github.ref, 'refs/tags/v') }}
+            type=semver,pattern={{version}},enable=${{ github.event_name == 'event_name' && startsWith(github.ref, 'refs/tags/v') }}
   
       - name: Build the Docker image and push
         uses: docker/build-push-action@v5
