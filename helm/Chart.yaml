@@ -1,7 +1,7 @@
 ---
 apiVersion: v2
 name: aws-quota-checker
-description: AWS quota checker exporter for Prometheus
+description: AWS quota checker for Prometheus
 # A chart can be either an 'application' or a 'library' chart.
 #
 # Application charts are a collection of templates that can be packaged into versioned archives
