@@ -34,21 +34,29 @@ jobs:
       AWS_REGION: us-east-1
       AWS_ROLE: arn:aws:iam::146628656107:role/aws-quota-checker-github-action-ecr-role
     steps:
-      - name: checkout
+      - name: Checkout repo
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-      - name: setup docker buildx
+      - name: Setup docker buildx
         uses: docker/setup-buildx-action@v3
         
-      - name: configure AWS credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ env.AWS_ROLE }}
-      - name: login to ECR
+      - name: Login to ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
         with:
           registry-type: public
+
+      - name: Login to GitHub Container Registry
+        id: login-ghcr
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Prepare docker labels and tags
         id: meta
@@ -56,6 +64,7 @@ jobs:
         with:
           images: |
             ${{ steps.login-ecr.outputs.registry }}/${{ github.repository }}
+            ${{ steps.login-ghcr.outputs.registry }}/${{ github.repository }}
           flavor: |
             latest=false
           tags: |
