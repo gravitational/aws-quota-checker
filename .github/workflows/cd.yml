@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - teleport
+      - fred/add-ghcr-publishing-2
     tags:
       - v*
   workflow_dispatch:
