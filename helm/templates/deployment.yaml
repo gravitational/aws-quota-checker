@@ -1,4 +1,4 @@
-{{- range .Values.exporter.aws.regions }}
+{{- range .Values.checker.aws.regions }}
 {{- $region := . }}
 {{- with $ }}
 ---
@@ -40,44 +40,44 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
-            {{- if .Values.exporter.enableDebugLogging }}
+            {{- if .Values.checker.enableDebugLogging }}
             - --debug
             {{- end }}
-            - prometheus-exporter
+            - prometheus-checker
             - --port
             - "8080"
             - --region
             - {{ $region | quote }}
-            {{- if .Values.exporter.aws.profileName }}
+            {{- if .Values.checker.aws.profileName }}
             - --profile
-            - {{ .Values.exporter.aws.profileName | quote }}
+            - {{ .Values.checker.aws.profileName | quote }}
             {{- end }}
-            {{- if .Values.exporter.aws.quotaLimitCheckIntervalSeconds }}
+            {{- if .Values.checker.aws.quotaLimitCheckIntervalSeconds }}
             - --limits-check-interval
-            - {{ .Values.exporter.aws.quotaLimitCheckIntervalSeconds | quote }}
+            - {{ .Values.checker.aws.quotaLimitCheckIntervalSeconds | quote }}
             {{- end }}
-            {{- if .Values.exporter.aws.quotaCurrentValueCheckIntervalSeconds }}
+            {{- if .Values.checker.aws.quotaCurrentValueCheckIntervalSeconds }}
             - --currents-check-interval
-            - {{ .Values.exporter.aws.quotaCurrentValueCheckIntervalSeconds | quote }}
+            - {{ .Values.checker.aws.quotaCurrentValueCheckIntervalSeconds | quote }}
             {{- end }}
-            {{- if .Values.exporter.aws.refreshResourcesIntervalSeconds }}
+            {{- if .Values.checker.aws.refreshResourcesIntervalSeconds }}
             - --reload-checks-interval
-            - {{ .Values.exporter.aws.refreshResourcesIntervalSeconds | quote }}
+            - {{ .Values.checker.aws.refreshResourcesIntervalSeconds | quote }}
             {{- end }}
-            {{- if .Values.exporter.prometheus.metricsPrefix }}
+            {{- if .Values.checker.prometheus.metricsPrefix }}
             - --namespace
-            - {{ .Values.exporter.prometheus.metricsPrefix | quote }}
+            - {{ .Values.checker.prometheus.metricsPrefix | quote }}
             {{- end }}
-            {{- if .Values.exporter.prometheus.enableDurationMetrics }}
+            {{- if .Values.checker.prometheus.enableDurationMetrics }}
             - --enable-duration-metrics
             {{- else }}
             - --disable-duration-metrics
             {{- end }}
-            - {{ join "," .Values.exporter.aws.enabledChecks }}
-          {{- if .Values.exporter.aws.credentialSecretName }}
+            - {{ join "," .Values.checker.aws.enabledChecks }}
+          {{- if .Values.checker.aws.credentialSecretName }}
           envFrom:
             - secretRef:
-                name: {{ .Values.exporter.aws.credentialSecretName | quote }}
+                name: {{ .Values.checker.aws.credentialSecretName | quote }}
                 optional: false
           {{- end }}
           ports:

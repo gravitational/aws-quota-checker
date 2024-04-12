@@ -1,4 +1,4 @@
-{{- range .Values.exporter.aws.regions }}
+{{- range .Values.checker.aws.regions }}
 {{- $region := . }}
 {{- with $ }}
 ---

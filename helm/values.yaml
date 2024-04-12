@@ -13,7 +13,7 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-exporter:
+checker:
   enableDebugLogging: false
   aws:
     regions:
