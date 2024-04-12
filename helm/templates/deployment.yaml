@@ -33,6 +33,9 @@ spec:
       {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.serviceAccount.enabled }}
+      serviceAccountName: {{ include "aws-quota-checker.fullname" . }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
