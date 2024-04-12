@@ -1,0 +1,22 @@
+{{- range .Values.exporter.aws.regions }}
+{{- $region := . }}
+{{- with $ }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ printf "%s-%s" (include "aws-quota-checker.fullname" .) ($region) }}
+  labels:
+    {{- include "aws-quota-checker.commonLabels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    {{- include "aws-quota-checker.selectorCommonLabels" . | nindent 4 }}
+    aws-quota-checker.gravitational.io/region: {{ $region | quote }}
+{{- end }}
+{{- end }}
