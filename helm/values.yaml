@@ -61,6 +61,11 @@ service:
 serviceMonitor:
   enabled: false
 
+serviceAccount:
+  enabled: true
+  annotations:
+    # key: value
+
 resources:
   {}
   # We usually recommend not to specify default resources and to leave this as a conscious
