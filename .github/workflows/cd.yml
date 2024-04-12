@@ -70,11 +70,13 @@ jobs:
             ghcr.io/${{ github.repository }}
           flavor: |
             latest=false
+          # Enable sha tag on branch push events and workflow dispatches.
+          # Enable semver tags on tag push events, but don't overwrite major/minor tags for prereleases.
           tags: |
-            type=sha,prefix={{branch}}-,suffix=-{{date 'YYYYMMDDTHHmmss'}},format=short,enable=true
-            type=semver,pattern={{major}},enable=${{ github.event_name == 'event_name' && startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-') }}
-            type=semver,pattern={{major}}.{{minor}},enable=${{ github.event_name == 'event_name' && startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-') }}
-            type=semver,pattern={{version}},enable=${{ github.event_name == 'event_name' && startsWith(github.ref, 'refs/tags/v') }}
+            type=sha,prefix={{branch}}-,suffix=-{{date 'YYYYMMDDTHHmmss'}},format=short,enable=${{ startsWith(github.ref, 'refs/heads/') }}
+            type=semver,pattern={{major}},enable=${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-') }}
+            type=semver,pattern={{major}}.{{minor}},enable=${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-') }}
+            type=semver,pattern={{version}},enable=${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
   
       - name: Build the Docker image and push
         uses: docker/build-push-action@v5
