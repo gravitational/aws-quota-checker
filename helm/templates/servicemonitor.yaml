@@ -8,8 +8,6 @@ metadata:
     {{- include "aws-quota-checker.commonLabels" . | nindent 4 }}
 spec:
   jobLabel: app.kubernetes.io/name
-  podTargetLabels:
-    - aws-quota-checker.gravitational.io/region
   selector:
     matchLabels:
       {{- include "aws-quota-checker.selectorCommonLabels" . | nindent 6 }}
