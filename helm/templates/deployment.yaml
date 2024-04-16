@@ -46,7 +46,7 @@ spec:
             {{- if .Values.checker.enableDebugLogging }}
             - --debug
             {{- end }}
-            - prometheus-checker
+            - prometheus-exporter
             - --port
             - "8080"
             - --region

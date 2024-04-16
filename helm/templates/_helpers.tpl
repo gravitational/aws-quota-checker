@@ -49,3 +49,17 @@ Selector labels
 app.kubernetes.io/name: {{ include "aws-quota-checker.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Dashboards to deploy
+*/}}
+{{- define "aws-quota-checker.enabledDashboardsYaml" -}}
+{{- $filteredFiles := dict }}
+{{- range $fileName, $fileContent := .Files.Glob "grafana-dashboards/*.json" }}
+{{- $baseFileName := base $fileName }}
+{{- if not (has $baseFileName $.Values.dashboards.ignoredDashboards) }}
+{{- $_ := set $filteredFiles $baseFileName ($fileContent | toString) }}
+{{- end }}
+{{- end }}
+{{- $filteredFiles | toYaml }}
+{{- end }}
