@@ -2,7 +2,9 @@ name: cd
 on:
   push:
     branches:
-    - teleport
+      - teleport
+    tags:
+      - v*
   workflow_dispatch:
 
 permissions:
@@ -33,22 +35,32 @@ jobs:
     env:
       AWS_REGION: us-east-1
       AWS_ROLE: arn:aws:iam::146628656107:role/aws-quota-checker-github-action-ecr-role
+    permissions:
+      packages: write
     steps:
-      - name: checkout
+      - name: Checkout repo
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-      - name: setup docker buildx
+      - name: Setup docker buildx
         uses: docker/setup-buildx-action@v3
         
-      - name: configure AWS credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ env.AWS_ROLE }}
-      - name: login to ECR
+      - name: Login to ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
         with:
           registry-type: public
+
+      - name: Login to GitHub Container Registry
+        id: login-ghcr
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Prepare docker labels and tags
         id: meta
@@ -56,10 +68,16 @@ jobs:
         with:
           images: |
             ${{ steps.login-ecr.outputs.registry }}/${{ github.repository }}
+            ghcr.io/${{ github.repository }}
           flavor: |
             latest=false
+          # Enable sha tag on branch push events and workflow dispatches.
+          # Enable semver tags on tag push events, but don't overwrite major/minor tags for prereleases.
           tags: |
-            type=sha,prefix={{branch}}-,suffix=-{{date 'YYYYMMDDTHHmmss'}},format=short,enable=true
+            type=sha,prefix={{branch}}-,suffix=-{{date 'YYYYMMDDTHHmmss'}},format=short,enable=${{ startsWith(github.ref, 'refs/heads/') }}
+            type=semver,pattern={{major}},enable=${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-') }}
+            type=semver,pattern={{major}}.{{minor}},enable=${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-') }}
+            type=semver,pattern={{version}},enable=${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
   
       - name: Build the Docker image and push
         uses: docker/build-push-action@v5
