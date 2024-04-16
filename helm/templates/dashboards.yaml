@@ -1,6 +1,4 @@
 {{- if .Values.dashboards.enabled }}
-{{- $files := .Files.Glob "grafana-dashboards/*.json" }}
-{{- if $files }}
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -12,6 +10,5 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 data:
-{{ $files.AsConfig | indent 2 }}
-{{- end }}
+{{ (include "aws-quota-checker.enabledDashboardsYaml" .) | indent 2 }}
 {{- end }}
