@@ -9,7 +9,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   test:
@@ -37,6 +36,7 @@ jobs:
       AWS_ROLE: arn:aws:iam::146628656107:role/aws-quota-checker-github-action-ecr-role
     permissions:
       packages: write
+      id-token: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
