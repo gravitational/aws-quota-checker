@@ -38,6 +38,17 @@ def check_keys_to_check_classes(check_string: str):
     return list(
         filter(lambda c: c.key not in blacklisted_check_keys, selected_checks))
 
+def set_quota_limit_override(quotaName: str, limitValue: int):
+    for check in ALL_CHECKS:
+        if check.key == quotaName:
+            check.quota_limit_override = limitValue
+            return
+
+    logger.warn('Override for check "%s" provided, but no check was found by that name', quotaName)
+
+def set_quota_limit_overrides(limitOverrides: typing.Dict[str, int]):
+    for quotaName, limitValue in limitOverrides.items():
+        set_quota_limit_override(quotaName, limitValue)
 
 class Runner:
     class ReportResult(enum.Enum):
@@ -129,14 +140,16 @@ class Runner:
 
 
 @click.group()
-@click.option('--debug/--no-debug', default=False)
-def cli(debug):
+@click.option('--debug/--no-debug', "debug", default=False)
+@click.option('--limit-override', "limitOverrides", type=(str, int), multiple=True)
+def cli(debug, limitOverrides):
     logging.basicConfig(
         level=logging.DEBUG if debug else logging.INFO,
         format='%(asctime)s [%(levelname)s] %(name)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S'
     )
     logging.getLogger('botocore.credentials').setLevel(logging.WARNING)
 
+    set_quota_limit_overrides(dict(limitOverrides))
 
 def common_scope_options(function):
     function = click.option(

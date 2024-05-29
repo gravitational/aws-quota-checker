@@ -34,6 +34,7 @@ class QuotaCheck:
     scope: QuotaScope = None
     service_code: str = None
     quota_code: str = None
+    quota_limit_override: int = None
     warning_threshold: float = None
     error_threshold: float = None
     # retries are needed to handle rate limiting
@@ -80,6 +81,9 @@ class QuotaCheck:
 
     @property
     def maximum(self) -> int:
+        if self.quota_limit_override is not None:
+            return self.quota_limit_override
+
         try:
             return int(get_service_quota(self.sq_client, self.service_code, self.quota_code)['Value'])
         except self.sq_client.exceptions.NoSuchResourceException:
