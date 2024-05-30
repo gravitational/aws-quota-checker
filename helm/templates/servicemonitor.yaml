@@ -1,4 +1,4 @@
-{{- if .Values.serviceMonitor.enabled }}
+{{- if .Values.monitoring.serviceMonitor.enabled }}
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -7,7 +7,6 @@ metadata:
   labels:
     {{- include "aws-quota-checker.commonLabels" . | nindent 4 }}
 spec:
-  jobLabel: app.kubernetes.io/name
   selector:
     matchLabels:
       {{- include "aws-quota-checker.selectorCommonLabels" . | nindent 6 }}

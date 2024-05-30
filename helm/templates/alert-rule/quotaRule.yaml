@@ -1,0 +1,53 @@
+{{- if gt (len .Values.alerting.prometheusRules.quotas) 0}}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "aws-quota-checker.fullname" . }}.quota-rules
+  labels:
+    {{- include "aws-quota-checker.commonLabels" . | nindent 4 }}
+    {{- with .Values.visualization.dashboards.additionalLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+    - name: aws_quota_checker.rules.quotas
+      rules:
+{{- range .Values.alerting.prometheusRules.quotas }}
+{{- $quotaName := .quotaName }}
+{{- $alertName := .alertName }}
+{{- $countQuery := printf "__name__=~\"awsquota_%s\"" $quotaName }}
+{{- $limitQuery := printf "__name__=~\"awsquota_%s_limit\"" $quotaName }}
+{{- if eq $quotaName "all" }}
+{{- $countQuery = "__name__=~\"awsquota_.*\",\n__name__!~\"awsquota_(check_count|info|.*_duration_seconds|.*_limit)\""}}
+{{- $limitQuery = "__name__=~\"awsquota_.*_limit\"" }}
+{{- end }}
+        - alert: AWSQuota {{- $alertName }}
+          expr: >-
+            sum by (account, region, aws_resource, quota, scope) (
+              {
+                {{- $countQuery | nindent 18 }},
+                job="{{ printf "%s-.*" (include "aws-quota-checker.fullname" $) }}",
+                namespace="{{ $.Release.Namespace }}"
+              }
+            )
+            /
+            sum by (account, region, aws_resource, quota, scope) (
+              {
+                {{- $limitQuery | nindent 18 }},
+                job="{{ printf "%s-.*" (include "aws-quota-checker.fullname" $) }}",
+                namespace="{{ $.Release.Namespace }}"
+              }
+            )
+            > {{ .threshold }}
+          {{- if .duration }}
+          for: {{ .duration }}
+          {{- end }}
+          annotations:
+            description: >-
+              Quota threshold of {{ mulf .threshold 100 }}% for {{ "{{" }} $labels.quota {{ "}}" }}
+              {{ "{{" }} if $labels.resource {{ "}}" }} on resource {{ "{{" }} $labels.resource {{ "}}" }}{{ "{{" }} end {{ "}}" }}
+              in {{ "{{" }} $labels.account {{ "}}" }}/{{ "{{" }}$labels.region{{ "}}" }} has been reached.
+            summary: Reached quota threshold for {{ "{{" }} $labels.quota {{ "}}" }}
+{{- end }}
+{{- end }}
