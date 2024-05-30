@@ -63,6 +63,8 @@ alerting:
       #   quotaName: ecr_images_per_repository
       #   duration: 5m
       #   threshold: 0.05
+    additionalLabels:
+      # labelName: labelValue
 
 visualization:
   # Grafana dashboards

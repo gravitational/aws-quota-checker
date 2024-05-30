@@ -49,5 +49,9 @@ spec:
               {{ "{{" }} if $labels.resource {{ "}}" }} on resource {{ "{{" }} $labels.resource {{ "}}" }}{{ "{{" }} end {{ "}}" }}
               in {{ "{{" }} $labels.account {{ "}}" }}/{{ "{{" }}$labels.region{{ "}}" }} has been reached.
             summary: Reached quota threshold for {{ "{{" }} $labels.quota {{ "}}" }}
+          {{- if $.Values.alerting.prometheusRules.additionalLabels }}
+          labels:
+            {{- $.Values.alerting.prometheusRules.additionalLabels | toYaml | trim | nindent 12 }}
+          {{- end }}
 {{- end }}
 {{- end }}
