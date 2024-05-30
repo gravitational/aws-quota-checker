@@ -75,7 +75,7 @@ class QuotaCheck:
             if isinstance(self.instance_id, dict):
                 label_values.update(self.instance_id)
             else:
-                label_values['instance'] = self.instance_id
+                label_values['aws_resource'] = self.instance_id
 
         return label_values
 
