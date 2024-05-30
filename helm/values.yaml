@@ -32,32 +32,33 @@ checker:
 
 monitoring:
   serviceMonitor:
-    enabled: true
+    enabled: false
 
 alerting:
   prometheusRules:
     requestDuration:
       longRunningLimitQuery:
-        enabled: true
+        enabled: false
         thresholdSeconds: 0.5
         duration: 15m
       longRunningCountQuery:
-        enabled: true
+        enabled: false
         thresholdSeconds: 5
         duration: 15m
       longRunningLimitQueryTotal:
-        enabled: true
+        enabled: false
         thresholdSeconds: 300
         duration: 30m
       longRunningCountQueryTotal:
-        enabled: true
+        enabled: false
         thresholdSeconds: 180
         duration: 30m
     quotas:
-      - alertName: General
-        quotaName: all
-        duration: 5m
-        threshold: 0.9
+      []
+      # - alertName: General
+      #   quotaName: all  # Special case to monitor all enabled metrics
+      #   duration: 5m
+      #   threshold: 0.9
       # - alertName: ECRImagesPerRepository
       #   quotaName: ecr_images_per_repository
       #   duration: 5m
