@@ -91,5 +91,9 @@ Rule template for request duration
               {{ $verbPhrase }} has averaged more than {{ $alertValues.thresholdSeconds }} seconds
               over the past {{ $alertValues.duration }}.
             summary: {{ $verbPhrase }} is taking too long.
+          {{- if $.Values.alerting.prometheusRules.additionalLabels }}
+          labels:
+            {{- $.Values.alerting.prometheusRules.additionalLabels | toYaml | trim | nindent 12 }}
+          {{- end }}
 {{- end }}
 {{- end }}

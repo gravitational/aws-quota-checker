@@ -126,7 +126,8 @@ class PrometheusExporter:
                     try:
                         with self.timeit_gauge(
                             name,
-                            documentation=f'Time to collect {check.description} Limit'
+                            documentation=f'Time to collect {check.description} Limit',
+                            labels=self.default_labels | labels
                         ):
                             value = check.maximum
 
@@ -166,7 +167,8 @@ class PrometheusExporter:
                     try:
                         with self.timeit_gauge(
                             name,
-                            documentation=f'Time to collect {check.description}'
+                            documentation=f'Time to collect {check.description}',
+                            labels=self.default_labels | labels
                         ):
                             value = check.current
 
