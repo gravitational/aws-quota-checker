@@ -40,19 +40,19 @@ alerting:
       longRunningLimitQuery:
         enabled: true
         thresholdSeconds: 0.5
-        duration: 5m
+        duration: 15m
       longRunningCountQuery:
         enabled: true
-        thresholdSeconds: 1
-        duration: 5m
+        thresholdSeconds: 5
+        duration: 15m
       longRunningLimitQueryTotal:
         enabled: true
-        thresholdSeconds: 0.5
-        duration: 5m
+        thresholdSeconds: 300
+        duration: 30m
       longRunningCountQueryTotal:
         enabled: true
-        thresholdSeconds: 1
-        duration: 5m
+        thresholdSeconds: 180
+        duration: 30m
     quotas:
       - alertName: General
         quotaName: all
