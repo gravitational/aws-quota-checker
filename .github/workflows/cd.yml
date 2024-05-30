@@ -111,7 +111,7 @@ jobs:
             commit)
               ;&
             dispatch)
-              CHART_VERSION="$(git describe --tags --dirty --long --match "v[[:digit:]]*.[[:digit:]]*.[[:digit:]]")"
+              CHART_VERSION="$(git describe --tags --dirty --long --match "v[[:digit:]]*.[[:digit:]]*.[[:digit:]]*")"
               ;;
             *)
               echo "Unknown event type '${EVENT_TYPE}', workflow bug?" >&2
@@ -119,8 +119,13 @@ jobs:
               ;;
           esac
 
+          # Trim `v` prefix if exists
+          CHART_VERSION=${CHART_VERSION#v}
+          IMAGE_VERSION=${IMAGE_VERSION#v}
+
           # Build/package the chart
-          helm package . --version "${CHART_VERSION#v}" --app-version "${IMAGE_VERSION#v}"
+          echo "Setting chart version to ${CHART_VERSION} and image version to ${IMAGE_VERSION}"
+          helm package . --version "${CHART_VERSION}" --app-version "${IMAGE_VERSION}"
           ARTIFACT_NAME=$(find . -name '*.tgz' -exec basename {} \; | head -n 1)
 
           # Publish the chart
