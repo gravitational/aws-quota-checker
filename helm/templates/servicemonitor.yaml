@@ -1,4 +1,4 @@
-{{- if .Values.serviceMonitor.enabled }}
+{{- if .Values.monitoring.serviceMonitor.enabled }}
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -14,10 +14,21 @@ spec:
   namespaceSelector:
     matchNames:
       - {{ .Release.Namespace | quote }}
+  targetLabels:
+    - app.kubernetes.io/instance
   endpoints:
     - honorLabels: true
       path: /metrics
       port: metrics
       scheme: http
       scrapeTimeout: 30s
+      metricRelabelings:
+{{- /*
+"instance" is a very common label that is often used to refernce the
+node that a pod is running on. Replace it with a more specific
+label. 
+*/}}
+        - sourceLabels:
+            - instance
+          replacement: aws_resource
 {{- end }}

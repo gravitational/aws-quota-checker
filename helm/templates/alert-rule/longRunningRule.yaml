@@ -1,0 +1,60 @@
+{{- $enableQuotaRule := false -}}
+{{- range $rule := values .Values.alerting.prometheusRules.requestDuration -}}
+{{- $enableQuotaRule = or $enableQuotaRule $rule.enabled -}}
+{{- end -}}
+{{- if $enableQuotaRule -}}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "aws-quota-checker.fullname" . }}.request-rules
+  labels:
+    {{- include "aws-quota-checker.commonLabels" . | nindent 4 }}
+    {{- with .Values.visualization.dashboards.additionalLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+    - name: aws_quota_checker.rules.queries
+      rules:
+{{-
+  include "aws-quota-checker.requestDurationRule" (
+    dict
+      "AlertValues" .Values.alerting.prometheusRules.requestDuration.longRunningLimitQuery
+      "QuerySuffix" "limit_duration_seconds"
+      "VerbPhrase" "Querying for one or more quota limits"
+      "AlertName" "LongRunningQuotaLimitQuery"
+      "Context" $
+  )
+}}
+{{-
+  include "aws-quota-checker.requestDurationRule" (
+    dict
+      "AlertValues" .Values.alerting.prometheusRules.requestDuration.longRunningCountQuery
+      "QuerySuffix" "count_duration_seconds"
+      "VerbPhrase" "Querying for one or more quota counts"
+      "AlertName" "LongRunningQuotaCountQuery"
+      "Context" $
+  )
+}}
+{{-
+  include "aws-quota-checker.requestDurationRule" (
+    dict
+      "AlertValues" .Values.alerting.prometheusRules.requestDuration.longRunningLimitQueryTotal
+      "QuerySuffix" "checks_duration_seconds"
+      "VerbPhrase" "Querying for all quota limits"
+      "AlertName" "LongRunningQuotaLimitQueryTotal"
+      "Context" $
+  )
+}}
+{{-
+  include "aws-quota-checker.requestDurationRule" (
+    dict
+      "AlertValues" .Values.alerting.prometheusRules.requestDuration.longRunningCountQueryTotal
+      "QuerySuffix" "currents_duration_seconds"
+      "VerbPhrase" "Querying for all quota counts"
+      "AlertName" "LongRunningQuotaCountQueryTotal"
+      "Context" $
+  )
+}}
+{{- end }}

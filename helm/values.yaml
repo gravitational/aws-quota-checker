@@ -1,7 +1,5 @@
 ---
 # Default values for aws-quota-checker.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 
 image:
   repository: ghcr.io/gravitational/aws-quota-checker
@@ -32,38 +30,67 @@ checker:
     # metricsPrefix: ""
     enableDurationMetrics: true
 
-# Grafana dashboards
-dashboards:
-  enabled: false
-  ignoredDashboards:
-    []
-    # - dynamic-limits-dashboard.json
-    # - on-demand-ec2.json
-  additionalLabels:
-    grafana_dashboard: "1" # Default label for Grafana Helm chart dashboard sidecar
+monitoring:
+  serviceMonitor:
+    enabled: true
+
+alerting:
+  prometheusRules:
+    requestDuration:
+      longRunningLimitQuery:
+        enabled: true
+        thresholdSeconds: 0.5
+        duration: 5m
+      longRunningCountQuery:
+        enabled: true
+        thresholdSeconds: 1
+        duration: 5m
+      longRunningLimitQueryTotal:
+        enabled: true
+        thresholdSeconds: 0.5
+        duration: 5m
+      longRunningCountQueryTotal:
+        enabled: true
+        thresholdSeconds: 1
+        duration: 5m
+    quotas:
+      - alertName: General
+        quotaName: all
+        duration: 5m
+        threshold: 0.9
+      # - alertName: ECRImagesPerRepository
+      #   quotaName: ecr_images_per_repository
+      #   duration: 5m
+      #   threshold: 0.05
+
+visualization:
+  # Grafana dashboards
+  dashboards:
+    enabled: false
+    ignoredDashboards:
+      []
+      # - dynamic-limits-dashboard.json
+      # - on-demand-ec2.json
+    additionalLabels:
+      grafana_dashboard: "1" # Default label for Grafana Helm chart dashboard sidecar
 
 podAnnotations: {}
 podLabels: {}
 
 podSecurityContext:
-  {}
-  # fsGroup: 2000
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
 
-securityContext:
-  {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+securityContext: {}
 
 service:
   type: ClusterIP
   port: 10014 # Next available port from https://github.com/prometheus/prometheus/wiki/Default-port-allocations
-
-serviceMonitor:
-  enabled: false
 
 serviceAccount:
   enabled: true
