@@ -46,7 +46,7 @@ spec:
           annotations:
             description: >-
               Quota threshold of {{ mulf .threshold 100 }}% for {{ "{{" }} $labels.quota {{ "}}" }}
-              {{ "{{" }} if $labels.resource {{ "}}" }} on resource {{ "{{" }} $labels.resource {{ "}}" }}{{ "{{" }} end {{ "}}" }}
+              {{ "{{" }} if $labels.aws_resource {{ "}}" }} on resource {{ "{{" }} $labels.aws_resource {{ "}}" }}{{ "{{" }} end {{ "}}" }}
               in {{ "{{" }} $labels.account {{ "}}" }}/{{ "{{" }}$labels.region{{ "}}" }} has been reached.
             summary: Reached quota threshold for {{ "{{" }} $labels.quota {{ "}}" }}
           {{- if $.Values.alerting.prometheusRules.additionalLabels }}
