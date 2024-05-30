@@ -18,3 +18,6 @@ jobs:
         run: python setup.py bdist_wheel
       - name: build docker image
         run: docker build . --tag gravitational/aws-quota-checker:test
+      - name: build helm chart
+        working-directory: helm
+        run: helm package .
