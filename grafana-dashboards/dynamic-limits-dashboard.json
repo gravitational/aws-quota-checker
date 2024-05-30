@@ -126,7 +126,7 @@
             "disableTextWrap": false,
             "editorMode": "code",
             "exemplar": false,
-            "expr": "sort_desc((max by(quota, account, service_code) ({__name__=~\"awsquota_.*$\", __name__!~\"awsquota_.*_limit$\", exported_instance=\"\", scope=\"ACCOUNT\"}) / max by(quota, account, service_code) ({__name__=~\"awsquota_.*_limit$\", exported_instance=\"\", scope=\"ACCOUNT\"})) >= $MinQuotaThreashold/100)",
+            "expr": "sort_desc((max by(quota, account, service_code) ({__name__=~\"awsquota_.*$\", __name__!~\"awsquota_.*_limit$\", aws_resource=\"\", scope=\"ACCOUNT\"}) / max by(quota, account, service_code) ({__name__=~\"awsquota_.*_limit$\", aws_resource=\"\", scope=\"ACCOUNT\"})) >= $MinQuotaThreashold/100)",
             "format": "time_series",
             "fullMetaSearch": false,
             "hide": false,
@@ -209,7 +209,7 @@
             "disableTextWrap": false,
             "editorMode": "code",
             "exemplar": false,
-            "expr": "sort_desc((max by(quota, region, service_code) ({__name__=~\"awsquota_.*$\", __name__!~\"awsquota_.*_limit$\", region=~\"$region\", exported_instance=\"\", scope=\"REGION\"}) / max by(quota, region, service_code) ({__name__=~\"awsquota_.*_limit$\", region=~\"$region\", exported_instance=\"\", scope=\"REGION\"})) >= $MinQuotaThreashold/100)",
+            "expr": "sort_desc((max by(quota, region, service_code) ({__name__=~\"awsquota_.*$\", __name__!~\"awsquota_.*_limit$\", region=~\"$region\", aws_resource=\"\", scope=\"REGION\"}) / max by(quota, region, service_code) ({__name__=~\"awsquota_.*_limit$\", region=~\"$region\", aws_resource=\"\", scope=\"REGION\"})) >= $MinQuotaThreashold/100)",
             "format": "time_series",
             "fullMetaSearch": false,
             "hide": false,
@@ -234,7 +234,7 @@
             "color": {
               "mode": "thresholds"
             },
-            "displayName": "[${__field.labels.exported_instance}] ${__field.labels.service_code} | ${__field.labels.quota}",
+            "displayName": "[${__field.labels.aws_resource}] ${__field.labels.service_code} | ${__field.labels.quota}",
             "fieldMinMax": false,
             "mappings": [],
             "max": 1,
@@ -292,7 +292,7 @@
             "disableTextWrap": false,
             "editorMode": "code",
             "exemplar": false,
-            "expr": "sort_desc(max by(quota, exported_instance, service_code) ({__name__=~\"awsquota_.*$\", __name__!~\"awsquota_.*_limit$\", scope=\"INSTANCE\", region=~\"$region\"}) / max by(quota, exported_instance, service_code) ({__name__=~\"awsquota_.*_limit$\", scope=\"INSTANCE\", region=~\"$region\"}) >= $MinQuotaThreashold/100)",
+            "expr": "sort_desc(max by(quota, aws_resource, service_code) ({__name__=~\"awsquota_.*$\", __name__!~\"awsquota_.*_limit$\", scope=\"INSTANCE\", region=~\"$region\"}) / max by(quota, aws_resource, service_code) ({__name__=~\"awsquota_.*_limit$\", scope=\"INSTANCE\", region=~\"$region\"}) >= $MinQuotaThreashold/100)",
             "format": "time_series",
             "fullMetaSearch": false,
             "hide": false,
@@ -368,7 +368,7 @@
               "$__all"
             ]
           },
-          "definition": "label_values(awsquota_check_count,region)",
+          "definition": "label_values(awsquota_info,region)",
           "hide": 0,
           "includeAll": true,
           "label": "region",
@@ -377,7 +377,7 @@
           "options": [],
           "query": {
             "qryType": 1,
-            "query": "label_values(awsquota_check_count,region)",
+            "query": "label_values(awsquota_info,region)",
             "refId": "PrometheusVariableQueryEditor-VariableQuery"
           },
           "refresh": 1,
