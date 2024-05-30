@@ -12,30 +12,30 @@ This is the first release of this project under Gravitational management.
 
 ### Added
 
-- Helm chart with Prometheus Operator support, pushed to GHCR (#29)
-- Multiarch container images (#33)
-- Images are now also pushed to GHCR, and include semver tags (#28)
-- Quota limits are now overridable via the `--limit-override` parameter (#31)
-- Service quota lookups are now cached (#22)
+- Helm chart with Prometheus Operator support, pushed to GHCR [#29](https://github.com/gravitational/aws-quota-checker/pull/29)
+- Multiarch container images [#33](https://github.com/gravitational/aws-quota-checker/pull/33)
+- Images are now also pushed to GHCR, and include semver tags [#28](https://github.com/gravitational/aws-quota-checker/pull/28)
+- Quota limits are now overridable via the `--limit-override` parameter [#31](https://github.com/gravitational/aws-quota-checker/pull/31)
+- Service quota lookups are now cached [#22](https://github.com/gravitational/aws-quota-checker/pull/22)
 - Added SNS checks for messages published per second, topic transactions per second,
-  and resource transactions per second (#23)
+  and resource transactions per second [#23](https://github.com/gravitational/aws-quota-checker/pull/23)
 - A new dynamic dashboard has been added to visualize resources nearing their
-  quota limits (#29)
-- Added checks for KMS, Athena, EKS, and EC2 launch templates (#15)
+  quota limits [#29](https://github.com/gravitational/aws-quota-checker/pull/29)
+- Added checks for KMS, Athena, EKS, and EC2 launch templates [#15](https://github.com/gravitational/aws-quota-checker/pull/15)
 - Added VPC checks for endpoint count, NAT gateway count, and peering
-  connections per VPC (#6)
+  connections per VPC [#6](https://github.com/gravitational/aws-quota-checker/pull/6)
 
 ### Changed
 
 - The `instance` label is now called `aws_resource` to avoid naming conflict
-  with Prometheus' `instance` service discovery label (#35)
+  with Prometheus' `instance` service discovery label [#35](https://github.com/gravitational/aws-quota-checker/pull/35)
 - Updated dependencies
 - Request duration metrics will now also include `account`, `region`, and
-  `aws_resource` labels (#34)
-- Updated all quota descriptions to match AWS descriptions (#20)
+  `aws_resource` labels [#34](https://github.com/gravitational/aws-quota-checker/pull/34)
+- Updated all quota descriptions to match AWS descriptions [#20](https://github.com/gravitational/aws-quota-checker/pull/20)
 
 ### Fixed
-- Fixed assorted quota scopes using incorrect values (#21)
+- Fixed assorted quota scopes using incorrect values [#21](https://github.com/gravitational/aws-quota-checker/pull/21)
 
 ## [1.12.0] - 2022-01-14
 
