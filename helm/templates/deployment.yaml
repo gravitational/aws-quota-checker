@@ -1,0 +1,113 @@
+{{- range .Values.checker.aws.regions }}
+{{- $region := . }}
+{{- with $ }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-%s" (include "aws-quota-checker.fullname" .) ($region) }}
+  labels:
+    {{- include "aws-quota-checker.commonLabels" . | nindent 4 }}
+    aws-quota-checker.gravitational.io/region: {{ $region | quote }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "aws-quota-checker.selectorCommonLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "aws-quota-checker.commonLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        aws-quota-checker.gravitational.io/region: {{ $region | quote }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.serviceAccount.enabled }}
+      serviceAccountName: {{ include "aws-quota-checker.fullname" . }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            {{- if .Values.checker.enableDebugLogging }}
+            - --debug
+            {{- end }}
+            - prometheus-exporter
+            - --port
+            - "8080"
+            - --region
+            - {{ $region | quote }}
+            {{- if .Values.checker.aws.profileName }}
+            - --profile
+            - {{ .Values.checker.aws.profileName | quote }}
+            {{- end }}
+            {{- if .Values.checker.aws.quotaLimitCheckIntervalSeconds }}
+            - --limits-check-interval
+            - {{ .Values.checker.aws.quotaLimitCheckIntervalSeconds | quote }}
+            {{- end }}
+            {{- if .Values.checker.aws.quotaCurrentValueCheckIntervalSeconds }}
+            - --currents-check-interval
+            - {{ .Values.checker.aws.quotaCurrentValueCheckIntervalSeconds | quote }}
+            {{- end }}
+            {{- if .Values.checker.aws.refreshResourcesIntervalSeconds }}
+            - --reload-checks-interval
+            - {{ .Values.checker.aws.refreshResourcesIntervalSeconds | quote }}
+            {{- end }}
+            {{- if .Values.checker.prometheus.metricsPrefix }}
+            - --namespace
+            - {{ .Values.checker.prometheus.metricsPrefix | quote }}
+            {{- end }}
+            {{- if .Values.checker.prometheus.enableDurationMetrics }}
+            - --enable-duration-metrics
+            {{- else }}
+            - --disable-duration-metrics
+            {{- end }}
+            - {{ join "," .Values.checker.aws.enabledChecks }}
+          {{- if .Values.checker.aws.credentialSecretName }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.checker.aws.credentialSecretName | quote }}
+                optional: false
+          {{- end }}
+          ports:
+            - name: metrics
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+{{- end }}

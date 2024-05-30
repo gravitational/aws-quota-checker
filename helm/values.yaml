@@ -1,0 +1,116 @@
+---
+# Default values for aws-quota-checker.
+
+image:
+  repository: ghcr.io/gravitational/aws-quota-checker
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+checker:
+  enableDebugLogging: false
+  aws:
+    regions:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+    enabledChecks:
+      - all
+    # credentialSecretName: ""  # Optional. Contains the name of a secret in the namespace that has standard AWS credential environment vars.
+    # profileName: ""
+    # quotaLimitCheckIntervalSeconds: 600
+    # quotaCurrentValueCheckIntervalSeconds: 300
+    # refreshResourcesIntervalSeconds: 300
+  prometheus:
+    # metricsPrefix: ""
+    enableDurationMetrics: true
+
+monitoring:
+  serviceMonitor:
+    enabled: false
+
+alerting:
+  prometheusRules:
+    requestDuration:
+      longRunningLimitQuery:
+        enabled: false
+        thresholdSeconds: 0.5
+        duration: 15m
+      longRunningCountQuery:
+        enabled: false
+        thresholdSeconds: 5
+        duration: 15m
+      longRunningLimitQueryTotal:
+        enabled: false
+        thresholdSeconds: 300
+        duration: 30m
+      longRunningCountQueryTotal:
+        enabled: false
+        thresholdSeconds: 180
+        duration: 30m
+    quotas:
+      []
+      # - alertName: General
+      #   quotaName: all  # Special case to monitor all enabled metrics
+      #   duration: 5m
+      #   threshold: 0.9
+      # - alertName: ECRImagesPerRepository
+      #   quotaName: ecr_images_per_repository
+      #   duration: 5m
+      #   threshold: 0.05
+    additionalLabels:
+      # labelName: labelValue
+
+visualization:
+  # Grafana dashboards
+  dashboards:
+    enabled: false
+    ignoredDashboards:
+      []
+      # - dynamic-limits-dashboard.json
+      # - on-demand-ec2.json
+    additionalLabels:
+      grafana_dashboard: "1" # Default label for Grafana Helm chart dashboard sidecar
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+
+service:
+  type: ClusterIP
+  port: 10014 # Next available port from https://github.com/prometheus/prometheus/wiki/Default-port-allocations
+
+serviceAccount:
+  enabled: true
+  annotations:
+    # key: value
+
+resources:
+  {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

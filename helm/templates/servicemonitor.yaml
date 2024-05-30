@@ -1,0 +1,22 @@
+{{- if .Values.monitoring.serviceMonitor.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "aws-quota-checker.fullname" . }}
+  labels:
+    {{- include "aws-quota-checker.commonLabels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "aws-quota-checker.selectorCommonLabels" . | nindent 6 }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace | quote }}
+  endpoints:
+    - honorLabels: true
+      path: /metrics
+      port: metrics
+      scheme: http
+      scrapeTimeout: 30s
+{{- end }}

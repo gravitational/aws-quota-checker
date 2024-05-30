@@ -1,0 +1,14 @@
+{{- if .Values.visualization.dashboards.enabled }}
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "aws-quota-checker.fullname" . }}-grafana-dashboards
+  labels:
+    {{- include "aws-quota-checker.commonLabels" . | nindent 4 }}
+    {{- with .Values.visualization.dashboards.additionalLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+data:
+{{ (include "aws-quota-checker.enabledDashboardsYaml" .) | indent 2 }}
+{{- end }}
