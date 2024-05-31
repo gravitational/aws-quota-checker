@@ -46,6 +46,11 @@ spec:
             {{- if .Values.checker.enableDebugLogging }}
             - --debug
             {{- end }}
+            {{- range $checkName, $overrideValue := .Values.checker.aws.limitOverrides }}
+            - --limit-override
+            - {{ $checkName | quote }}
+            - {{ $overrideValue | quote }}
+            {{- end }}
             - prometheus-exporter
             - --port
             - "8080"

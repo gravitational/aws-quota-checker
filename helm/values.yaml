@@ -21,6 +21,8 @@ checker:
       - us-west-2
     enabledChecks:
       - all
+    limitOverrides:
+      # ecr_images_per_repository: 40000
     # credentialSecretName: ""  # Optional. Contains the name of a secret in the namespace that has standard AWS credential environment vars.
     # profileName: ""
     # quotaLimitCheckIntervalSeconds: 600
