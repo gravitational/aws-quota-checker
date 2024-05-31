@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.14.0] - 2024-05-31
+
 ### Added
 
 - Added support for setting limit overrides in the Helm chart [#41](https://github.com/gravitational/aws-quota-checker/pull/41)
