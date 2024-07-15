@@ -1,7 +1,25 @@
 from aws_quota.exceptions import InstanceWithIdentifierNotFound
 import typing
 import boto3
+import cachetools
 from .quota_check import InstanceQuotaCheck, QuotaCheck, QuotaScope
+
+# Route53 has quite a low API rate limits, adding cache should reduce throttling rates a bit
+# https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/DNSLimitations.html#limits-api-requests
+
+@cachetools.cached(cache=cachetools.TTLCache(maxsize=10, ttl=1200))
+def get_route53_account_limits(session: boto3.Session, limit_type: str):
+    return session.client("route53").get_account_limit(Type=limit_type)
+
+
+@cachetools.cached(cache=cachetools.TTLCache(maxsize=100, ttl=1200))
+def get_route53_hosted_zone_limits(session: boto3.Session, limit_type: str, hosted_zone_id: str):
+    return session.client("route53").get_hosted_zone_limit(Type=limit_type, HostedZoneId=hosted_zone_id)
+
+
+@cachetools.cached(cache=cachetools.TTLCache(maxsize=1, ttl=1200))
+def list_route53_hosted_zones(session: boto3.Session):
+    return session.client("route53").list_hosted_zones()["HostedZones"]
 
 
 class HostedZoneCountCheck(QuotaCheck):
@@ -12,11 +30,11 @@ class HostedZoneCountCheck(QuotaCheck):
 
     @property
     def maximum(self):
-        return self.boto_session.client('route53').get_account_limit(Type='MAX_HOSTED_ZONES_BY_OWNER')['Limit']['Value']
+        return get_route53_account_limits(self.boto_session, "MAX_HOSTED_ZONES_BY_OWNER")["Limit"]["Value"]
 
     @property
     def current(self):
-        return self.boto_session.client('route53').get_account_limit(Type='MAX_HOSTED_ZONES_BY_OWNER')['Count']
+        return get_route53_account_limits(self.boto_session, "MAX_HOSTED_ZONES_BY_OWNER")["Count"]
 
 
 class HealthCheckCountCheck(QuotaCheck):
@@ -27,11 +45,11 @@ class HealthCheckCountCheck(QuotaCheck):
 
     @property
     def maximum(self):
-        return self.boto_session.client('route53').get_account_limit(Type='MAX_HEALTH_CHECKS_BY_OWNER')['Limit']['Value']
+        return get_route53_account_limits(self.boto_session, "MAX_HEALTH_CHECKS_BY_OWNER")["Limit"]["Value"]
 
     @property
     def current(self):
-        return self.boto_session.client('route53').get_account_limit(Type='MAX_HEALTH_CHECKS_BY_OWNER')['Count']
+        return get_route53_account_limits(self.boto_session, "MAX_HEALTH_CHECKS_BY_OWNER")["Count"]
 
 
 class ReusableDelegationSetCountCheck(QuotaCheck):
@@ -42,11 +60,11 @@ class ReusableDelegationSetCountCheck(QuotaCheck):
 
     @property
     def maximum(self):
-        return self.boto_session.client('route53').get_account_limit(Type='MAX_REUSABLE_DELEGATION_SETS_BY_OWNER')['Limit']['Value']
+        return get_route53_account_limits(self.boto_session, "MAX_REUSABLE_DELEGATION_SETS_BY_OWNER")["Limit"]["Value"]
 
     @property
     def current(self):
-        return self.boto_session.client('route53').get_account_limit(Type='MAX_REUSABLE_DELEGATION_SETS_BY_OWNER')['Count']
+        return get_route53_account_limits(self.boto_session, "MAX_REUSABLE_DELEGATION_SETS_BY_OWNER")["Count"]
 
 
 class TrafficPolicyCountCheck(QuotaCheck):
@@ -57,11 +75,11 @@ class TrafficPolicyCountCheck(QuotaCheck):
 
     @property
     def maximum(self):
-        return self.boto_session.client('route53').get_account_limit(Type='MAX_TRAFFIC_POLICIES_BY_OWNER')['Limit']['Value']
+        return get_route53_account_limits(self.boto_session, "MAX_TRAFFIC_POLICIES_BY_OWNER")["Limit"]["Value"]
 
     @property
     def current(self):
-        return self.boto_session.client('route53').get_account_limit(Type='MAX_TRAFFIC_POLICIES_BY_OWNER')['Count']
+        return get_route53_account_limits(self.boto_session, "MAX_TRAFFIC_POLICIES_BY_OWNER")["Count"]
 
 
 class TrafficPolicyInstanceCountCheck(QuotaCheck):
@@ -72,58 +90,58 @@ class TrafficPolicyInstanceCountCheck(QuotaCheck):
 
     @property
     def maximum(self):
-        return self.boto_session.client('route53').get_account_limit(Type='MAX_TRAFFIC_POLICY_INSTANCES_BY_OWNER')['Limit']['Value']
+        return get_route53_account_limits(self.boto_session, "MAX_TRAFFIC_POLICY_INSTANCES_BY_OWNER")["Limit"]["Value"]
 
     @property
     def current(self):
-        return self.boto_session.client('route53').get_account_limit(Type='MAX_TRAFFIC_POLICY_INSTANCES_BY_OWNER')['Count']
+        return get_route53_account_limits(self.boto_session, "MAX_TRAFFIC_POLICY_INSTANCES_BY_OWNER")["Count"]
 
 
 class RecordsPerHostedZoneCheck(InstanceQuotaCheck):
     key = "route53_records_per_hosted_zone"
     description = "Records per Route53 Hosted Zone"
-    instance_id = 'Hosted Zone ID'
+    instance_id = "Hosted Zone ID"
     service_code = "route53"
 
     @staticmethod
     def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
-        return [zone['Id'] for zone in session.client('route53').list_hosted_zones()['HostedZones']]
+        return [zone["Id"] for zone in list_route53_hosted_zones(session)]
 
     @property
     def maximum(self):
         try:
-            return self.boto_session.client('route53').get_hosted_zone_limit(Type='MAX_RRSETS_BY_ZONE', HostedZoneId=self.instance_id)['Limit']['Value']
-        except self.boto_session.client('route53').exceptions.NoSuchHostedZone as e:
+            return get_route53_hosted_zone_limits(self.boto_session, "MAX_RRSETS_BY_ZONE", self.instance_id)["Limit"]["Value"]
+        except self.boto_session.client("route53").exceptions.NoSuchHostedZone as e:
             raise InstanceWithIdentifierNotFound(self) from e
 
     @property
     def current(self):
         try:
-            return self.boto_session.client('route53').get_hosted_zone_limit(Type='MAX_RRSETS_BY_ZONE', HostedZoneId=self.instance_id)['Count']
-        except self.boto_session.client('route53').exceptions.NoSuchHostedZone as e:
+            return get_route53_hosted_zone_limits(self.boto_session, "MAX_RRSETS_BY_ZONE", self.instance_id)["Count"]
+        except self.boto_session.client("route53").exceptions.NoSuchHostedZone as e:
             raise InstanceWithIdentifierNotFound(self) from e
 
 
 class AssociatedVpcHostedZoneCheck(InstanceQuotaCheck):
     key = "route53_vpcs_per_hosted_zone"
     description = "Associated VPCs per Route53 Hosted Zone"
-    instance_id = 'Hosted Zone ID'
+    instance_id = "Hosted Zone ID"
     service_code = "route53"
 
     @staticmethod
     def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
-        return [zone['Id'] for zone in session.client('route53').list_hosted_zones()['HostedZones'] if zone['Config']['PrivateZone']]
+        return [zone["Id"] for zone in list_route53_hosted_zones(session) if zone["Config"]["PrivateZone"]]
 
     @property
     def maximum(self):
         try:
-            return self.boto_session.client('route53').get_hosted_zone_limit(Type='MAX_VPCS_ASSOCIATED_BY_ZONE', HostedZoneId=self.instance_id)['Limit']['Value']
-        except self.boto_session.client('route53').exceptions.NoSuchHostedZone as e:
+            return get_route53_hosted_zone_limits(self.boto_session, "MAX_VPCS_ASSOCIATED_BY_ZONE", self.instance_id)["Limit"]["Value"]
+        except self.boto_session.client("route53").exceptions.NoSuchHostedZone as e:
             raise InstanceWithIdentifierNotFound(self) from e
 
     @property
     def current(self):
         try:
-            return self.boto_session.client('route53').get_hosted_zone_limit(Type='MAX_VPCS_ASSOCIATED_BY_ZONE', HostedZoneId=self.instance_id)['Count']
-        except self.boto_session.client('route53').exceptions.NoSuchHostedZone as e:
+            return get_route53_hosted_zone_limits(self.boto_session, "MAX_VPCS_ASSOCIATED_BY_ZONE", self.instance_id)["Count"]
+        except self.boto_session.client("route53").exceptions.NoSuchHostedZone as e:
             raise InstanceWithIdentifierNotFound(self) from e
