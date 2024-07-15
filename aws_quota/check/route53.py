@@ -5,17 +5,17 @@ import cachetools
 from .quota_check import InstanceQuotaCheck, QuotaCheck, QuotaScope
 
 
-@cachetools.cached(cache=cachetools.TTLCache(1, 600))
+@cachetools.cached(cache=cachetools.TTLCache(maxsize=10, ttl=600))
 def get_route53_account_limits(session: boto3.Session, limit_type: str):
     return session.client("route53").get_account_limit(Type=limit_type)
 
 
-@cachetools.cached(cache=cachetools.TTLCache(1, 600))
+@cachetools.cached(cache=cachetools.TTLCache(maxsize=100, ttl=600))
 def get_route53_hosted_zone_limits(session: boto3.Session, limit_type: str, hosted_zone_id: str):
     return session.client("route53").get_hosted_zone_limit(Type=limit_type, HostedZoneId=hosted_zone_id)
 
 
-@cachetools.cached(cache=cachetools.TTLCache(1, 600))
+@cachetools.cached(cache=cachetools.TTLCache(maxsize=1, ttl=600))
 def list_route53_hosted_zones(session: boto3.Session):
     return session.client("route53").list_hosted_zones()["HostedZones"]
 
