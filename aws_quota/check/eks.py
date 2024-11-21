@@ -15,6 +15,10 @@ def get_all_eks_clusters(session: boto3.Session) -> typing.List[str]:
 def get_node_groups(session: boto3.Session, cluster_name) -> typing.List[str]:
     return get_paginated_results(session, "eks", "list_nodegroups", "nodegroups", {'clusterName': cluster_name})
 
+@cachetools.cached(cache=cachetools.TTLCache(100, 60))
+def get_eks_pod_identities(session: boto3.Session, cluster_name) -> typing.List[str]:
+    return get_paginated_results(session, "eks", "list_pod_identity_associations", "associations", {'clusterName': cluster_name})
+
 class ClusterCountCheck(QuotaCheck):
     key = "eks_count"
     scope = QuotaScope.REGION
@@ -80,3 +84,21 @@ class NodesPerNodeGroup(InstanceQuotaCheck):
                 count += 1
 
         return count
+
+
+class EKSPodIdentityAssociationsPerCluster(InstanceQuotaCheck):
+    key = "eks_pod_identity_associations_per_cluster_count"
+    service_code = 'eks'
+    # not supported by service quota at the moment
+    # # https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html#sq-text
+    quota_limit_override = 1000
+    description = "The maximum number of EKS Pod Identity Associations per cluster."
+    instance_id = 'Cluster ID'
+
+    @staticmethod
+    def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
+        return get_all_eks_clusters(session)
+
+    @property
+    def current(self):
+        return len(get_eks_pod_identities(self.boto_session, self.instance_id))
