@@ -1,4 +1,4 @@
-FROM python:3.11-alpine3.20
+FROM python:3.12-alpine
 LABEL org.opencontainers.image.source https://github.com/brennerm/aws-quota-checker
 RUN apk upgrade
 WORKDIR /app
