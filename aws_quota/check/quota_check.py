@@ -35,6 +35,7 @@ class QuotaCheck:
     service_code: str = None
     quota_code: str = None
     quota_limit_override: int = None
+    quota_region_override: str = None
     warning_threshold: float = None
     error_threshold: float = None
     # retries are needed to handle rate limiting
@@ -45,12 +46,18 @@ class QuotaCheck:
         super().__init__()
 
         self.boto_session = boto_session
-        self.sq_client = boto_session.client('service-quotas', config=Config(
+        client_config = Config(
             retries = {
                 'max_attempts': self.retry_attempts,
                 'mode': 'standard'
             }
-        ))
+        )
+        
+        client_region=None
+        if self.scope == QuotaScope.ACCOUNT and self.quota_region_override:
+            client_region = self.quota_region_override
+
+        self.sq_client = boto_session.client('service-quotas', config=client_config, region_name=client_region)
 
     def __str__(self) -> str:
         return f'{self.key}{self.label_values}'
