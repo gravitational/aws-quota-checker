@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.14.2] - 2024-11-21
+
+- Add `quota_region_override` and set to `us-east-1` for `s3_bucket_count` [#48](https://github.com/gravitational/aws-quota-checker/pull/48)
+- Update python to 3.12 and bump dependencies [#47](https://github.com/gravitational/aws-quota-checker/pull/47)
+- Add `eks_pod_identity_associations_per_cluster_count` check [#46](https://github.com/gravitational/aws-quota-checker/pull/46)
+
 ## [1.14.1] - 2024-07-15
 
 - Added cache to Route53 calls to avoid rate-limitting [#43](https://github.com/gravitational/aws-quota-checker/pull/43)
