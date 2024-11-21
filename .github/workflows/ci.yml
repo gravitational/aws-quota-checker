@@ -14,8 +14,6 @@ jobs:
           python-version: "3.12"
       - name: install
         run: pip install .[dev]
-      - name: build package
-        run: python setup.py bdist_wheel
       - name: build docker image
         run: docker build . --tag gravitational/aws-quota-checker:test
       - name: build helm chart
