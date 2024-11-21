@@ -6,6 +6,7 @@ class BucketCountCheck(QuotaCheck):
     scope = QuotaScope.ACCOUNT
     service_code = 's3'
     quota_code = 'L-DC2B2D3D'
+    quota_region_override = 'us-east-1'
     description = "The number of Amazon S3 general purpose buckets that you can create in an account"
 
     @property
