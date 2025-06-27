@@ -90,8 +90,9 @@ class EKSPodIdentityAssociationsPerCluster(InstanceQuotaCheck):
     key = "eks_pod_identity_associations_per_cluster_count"
     service_code = 'eks'
     # not supported by service quota at the moment
-    # # https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html#sq-text
-    quota_limit_override = 1000
+    # - https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html#sq-text
+    # - https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html#pod-id-considerations
+    quota_limit_override = 5000
     description = "The maximum number of EKS Pod Identity Associations per cluster."
     instance_id = 'Cluster ID'
 
