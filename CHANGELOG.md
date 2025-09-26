@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.0] - 2025-09-26
+
+- Modernize and harden builds [#52](https://github.com/gravitational/aws-quota-checker/pull/52):
+  - Update python to 3.13
+  - Bump boto and other dependencies
+  - Make sure dependencies are always installed from the lockfile
+  - Use multi-stage docker build
+
 ## [1.14.3] - 2025-06-27
 
 - Set `eks_pod_identity_associations_per_cluster_count` to the new limit of 5000 [#50](https://github.com/gravitational/aws-quota-checker/pull/50)
