@@ -2,7 +2,7 @@ REGION?=us-west-2
 CHECKS?=all
 
 install:
-	pipenv install
+	pipenv sync --dev
 
 prometheus: EXTRA_ARGS?="--disable-duration-metrics"
 prometheus: install
