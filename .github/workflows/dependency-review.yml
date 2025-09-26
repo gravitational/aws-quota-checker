@@ -9,3 +9,6 @@ jobs:
     uses: gravitational/shared-workflows/.github/workflows/dependency-review.yaml@main
     permissions:
       contents: read
+    with:
+      allow-additional-licenses: >
+        Apache-2.0 AND MIT AND MPL-2.0
