@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Update and pin all dependencies
+  - Update python to 3.14
+  - Update boto3, click, cachetools
+  - Pin all GitHub Action usages
+
 ## [1.15.0] - 2025-09-26
 
 - Modernize and harden builds [#52](https://github.com/gravitational/aws-quota-checker/pull/52):

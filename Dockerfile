@@ -1,4 +1,4 @@
-ARG TARGET_PYTHON_VERSION=3.13
+ARG TARGET_PYTHON_VERSION=3.14.2
 
 ### Dependencies stage
 FROM python:${TARGET_PYTHON_VERSION}-alpine AS builder

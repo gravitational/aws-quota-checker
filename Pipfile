@@ -10,4 +10,4 @@ aws-quota-checker = { editable = true, extras = ["prometheus"], path = "." }
 aws-quota-checker = { editable = true, extras = ["dev"], path = "." }
 
 [requires]
-python_version = "3.13"
+python_version = "3.14"
