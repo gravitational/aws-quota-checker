@@ -8,7 +8,7 @@ from .quota_check import InstanceQuotaCheck, QuotaCheck, QuotaScope
 
 
 
-@cachetools.cached(cache=cachetools.TTLCache(maxsize=50, ttl=60))
+@cachetools.cached(cache=cachetools.TTLCache(maxsize=3000, ttl=60))
 def get_inference_profile_summaries(session: boto3.Session,
                                     type_equals: str | None = None) -> typing.List[dict]:
     paginate_args = {}
@@ -45,7 +45,7 @@ def inference_profile_summaries_by_identifier(session: boto3.Session) -> dict[st
 # Based on https://docs.aws.amazon.com/general/latest/gr/bedrock.html
 class BedrockInferenceProfilesPerAccount(QuotaCheck):
     key = "bedrock_inference_profiles_per_account_count"
-    scope = QuotaScope.ACCOUNT
+    scope = QuotaScope.REGION
     service_code = 'bedrock'
     quota_code = 'L-40EC9882'
     description = "The maximum number of inference profiles per account."
