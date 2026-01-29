@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.6] - 2026-01-29
+
+- add Bedrock profile quotas [#59](https://github.com/gravitational/aws-quota-checker/pull/59)
+
 ## [1.15.4] - 2026-01-05
 
 ### Fixed
