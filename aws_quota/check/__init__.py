@@ -1,6 +1,7 @@
 from .appmesh import *
 from .athena import *
 from .autoscaling import *
+from .bedrock import *
 from .cloudformation import *
 from .dynamodb import *
 from .ebs import *
