@@ -1,3 +1,6 @@
+> [!NOTE]  
+> This fork is for internal use.  We provide it as-is for the community, but please be aware that we are not actively monitoring or accepting external contributions.
+
 # aws-quota-checker
 
 A tool that helps keeping track of your AWS quota utilization. It'll determine the limits of your AWS account and compare them to the number of current resources.
