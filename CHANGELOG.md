@@ -1,5 +1,7 @@
 # Changelog
 
+> [!NOTE] The changelog file is deprecated. As of 1.15.7, the changelog has been moved to [GitHub releases](https://github.com/gravitational/aws-quota-checker/releases).
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
