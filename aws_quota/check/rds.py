@@ -1,6 +1,19 @@
 from .quota_check import QuotaCheck, QuotaScope
 
 
+class RDSDBClusterCountCheck(QuotaCheck):
+    key = "rds_clusters"
+    service_code = "rds"
+    scope = QuotaScope.REGION
+    quota_code = "L-952B80B8"
+    description = "The maximum number of DB clusters allowed in this account in the current Region"
+
+    @property
+    def current(self) -> int:
+        return self.count_paginated_results(
+            "rds", "describe_db_clusters", "DBClusters"
+        )
+
 class RDSDBInstanceCountCheck(QuotaCheck):
     key = "rds_instances"
     service_code = "rds"
