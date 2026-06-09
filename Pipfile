@@ -11,4 +11,4 @@ aws-quota-checker = { editable = true, extras = ["dev"], path = "." }
 urllib3 = "*"
 
 [requires]
-python_version = "3.14"
+python_version = "3.15"

@@ -1,5 +1,6 @@
-ARG TARGET_PYTHON_VERSION=3.14.4
-ARG TARGET_PYTHON_MINOR=3.14
+# TODO: update when 3.15 stable is released
+ARG TARGET_PYTHON_VERSION=3.15.0b2
+ARG TARGET_PYTHON_MINOR=3.15
 
 ### Dependencies stage
 FROM python:${TARGET_PYTHON_VERSION}-alpine AS builder
