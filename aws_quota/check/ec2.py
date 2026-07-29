@@ -203,7 +203,11 @@ class ElasticIpCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('ec2').describe_addresses()['Addresses'])
+        return len([
+            address
+            for address in self.boto_session.client('ec2').describe_addresses()['Addresses']
+            if address.get('ServiceManaged') is None
+        ])
 
 
 class TransitGatewayCountCheck(QuotaCheck):
@@ -249,7 +253,7 @@ class AmiCount(QuotaCheck):
 
     @property
     def current(self):
-        return self.count_paginated_results("ec2", "describe_images", "Images", 
+        return self.count_paginated_results("ec2", "describe_images", "Images",
                                             {"Owners": ["self"], "IncludeDeprecated": True, "IncludeDisabled": True}) + \
             self.count_paginated_results("ec2", "list_images_in_recycle_bin", "Images")
 
@@ -262,6 +266,6 @@ class PublicAmiCount(QuotaCheck):
 
     @property
     def current(self):
-        return self.count_paginated_results("ec2", "describe_images", "Images", 
-                                            {"Owners": ["self"], "IncludeDeprecated": True, "IncludeDisabled": True, 
+        return self.count_paginated_results("ec2", "describe_images", "Images",
+                                            {"Owners": ["self"], "IncludeDeprecated": True, "IncludeDisabled": True,
                                              "Filters":[{"Name": "is-public", "Values": ["true"]}]})
