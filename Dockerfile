@@ -1,5 +1,4 @@
-# TODO: update when 3.15 stable is released
-ARG TARGET_PYTHON_VERSION=3.15.0rc2
+ARG TARGET_PYTHON_VERSION=3.15.0
 ARG TARGET_PYTHON_MINOR=3.15
 
 ### Dependencies stage

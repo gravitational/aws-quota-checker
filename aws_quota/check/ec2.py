@@ -203,7 +203,11 @@ class ElasticIpCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('ec2').describe_addresses()['Addresses'])
+        return len([
+            address
+            for address in self.boto_session.client('ec2').describe_addresses()['Addresses']
+            if address.get('ServiceManaged') is None
+        ])
 
 
 class TransitGatewayCountCheck(QuotaCheck):
